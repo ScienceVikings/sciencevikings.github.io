@@ -1,2 +1,1 @@
-sciencevikings.github.io
-========================
+Science Viking Labs Blog
