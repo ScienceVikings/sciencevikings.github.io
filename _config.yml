@@ -10,3 +10,5 @@ github_username:  ScienceVikings
 
 # Build settings
 markdown: kramdown
+
+highlighter:      rouge
