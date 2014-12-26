@@ -96,24 +96,7 @@ Next, in your repository directory create a bootstrap.sh file. This file will ge
 Since this file is a bash file, it will run every line of the file as if we typed it into the command line ourselves.
 Note that lines starting with # are comments. Our example file might look something like this:
 
-{% highlight shell %}
-
-#!/usr/bin/env bash
-
-#Get Packages
-#the -y tells the apt-get program to
-#respond with "yes" to every "are you sure" question
-apt-get -y update
-apt-get install -y python2.7-dev
-apt-get install -y curl
-apt-get install -y python-pip
-
-#Get python libraries using pip
-pip install beautifulsoup4
-pip install mechanize
-pip install selenium
-
-{% endhighlight %}
+<script src="https://gist.github.com/jbasinger/62268f28bd8dc7eb52e6.js"></script>
 
 Now, if your vagrant isn’t already running, when you run the command `vagrant up` the system will automatically be
 provisioned. If your vagrant machine is already running, that’s ok, you can just run `vagrant provision` to start
