@@ -2,7 +2,7 @@
 layout: post
 title:  "Vagrant Getting Started"
 date:   2014-12-21 16:18:27
-categories: science vagrant
+categories: science vagrant code
 author: Justin
 ---
 # Why Vagrant?
