@@ -109,7 +109,7 @@ Congratulations! You now have your hybrid mobile app running in a browser!
 
 When you load up the app initially, you're probably wondering why you get a pile of alerts all in a row. This is a side
 effect of the cordova.js library. It expects certain things that exist in your device's browser that don't exist in
-your normal desktop browser. Here are a couple things you can to do make the cordova.js library only load up on mobile
+your normal desktop browser. Here are a couple things you can do to make the cordova.js library only load up on mobile
 devices. You may have to restart the cordova server for these changes to take effect.
 
 In your index.html file under the www/ folder, comment out the `<script type="text/javascript" src="cordova.js"></script>`
