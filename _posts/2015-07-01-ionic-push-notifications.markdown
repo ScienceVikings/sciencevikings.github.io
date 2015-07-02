@@ -94,7 +94,7 @@ You can get your private key from the [dashboard](https://apps.ionic.io/apps) as
 well, by selecting the settings of your app and viewing the Secret Key.
 
 The POST body will need to be in JSON format like the following:
-<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43.js?file=jsonformat.js"></script>
+<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43.js?file=JSONFormat.js"></script>
 
 The tokens are the device tokens you want to send the notification to. The
 `alert` key is what will show up on the notification screen, and the payload
