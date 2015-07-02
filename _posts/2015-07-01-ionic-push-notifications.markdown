@@ -94,27 +94,7 @@ You can get your private key from the [dashboard](https://apps.ionic.io/apps) as
 well, by selecting the settings of your app and viewing the Secret Key.
 
 The POST body will need to be in JSON format like the following:
-```
-{
-  "tokens":[
-    "b284a6f7545368d2d3f753263e3e2f2b7795be5263ed7c95017f628730edeaad",
-    "d609f7cba82fdd0a568d5ada649cddc5ebb65f08e7fc72599d8d47390bfc0f20"
-  ],
-  "notification":{
-    "alert":"Hello World!",
-    "android":{
-      "collapseKey":"foo",
-      "delayWhileIdle":true,
-      "timeToLive":300,
-      "payload":{
-        "$state": "a_ui-router_state",
-        "key1":"value",
-        "key2":"value"
-      }
-    }
-  }
-}
-```
+<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43#file-jsonformat-js"></script>
 
 The tokens are the device tokens you want to send the notification to. The
 `alert` key is what will show up on the notification screen, and the payload
@@ -142,12 +122,7 @@ First you need to install a few extra components in your Ionic app using their
 `ionic add` and `ionic plugin` command line functions. From your app's directory
 in a terminal run the following commands:
 
-```
-ionic plugin add https://github.com/phonegap-build/PushPlugin.git
-ionic add ngCordova
-ionic add ionic-service-core
-ionic add ionic-service-push
-```
+<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43#file-appsetupcommands-sh"></script>
 
 This will install the phonegap push notification plugin, Ionic's angular to
 cordova plugin framework, and Ionic's core and push services used to make
@@ -155,26 +130,12 @@ the rest of this a breeze.
 
 Then, open up your `index.html` page and add the following libraries to your
 `<head>` tag:
-
-```
-<!-- ionic/angularjs js -->
-<script src="lib/ionic/js/ionic.bundle.js"></script>
-<script src="lib/ngCordova/dist/ng-cordova.js"></script>
-<script src="lib/ionic-service-core/ionic-core.js"></script>
-<script src="lib/ionic-service-push/ionic-push.js"></script>
-```
+<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43#file-scripttags-html"></script>
 
 Finally, you need to add those services to where you declare your angularjs
 module. It should look something like this:
 
-```
-angular.module('yourTotallyAwesomeApp', [
-  'ionic',
-  'ngCordova',
-  'ionic.service.core',
-  'ionic.service.push'
-]);
-```
+<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43#file-moduleadditions-js"></script>
 
 Please note that all these examples above were borrowed from
 [Ionic's documentation](http://docs.ionic.io/v1.0/docs/push-from-scratch).
@@ -212,18 +173,7 @@ and selecting your project and then clicking the Overview link will give you
 your GCM ID. It's the Project Number across the top.
 
 Your `config` block should look something like this:
-```
-angular.module('yourTotallyAwesomeApp')
-.config(['$ionicAppProvider', function($ionicAppProvider) {
-
-  $ionicAppProvider.identify({
-    app_id: 'ionic_app_ID',
-    api_key: 'ionic_public_key',
-    gcm_id: 'google_project_number'
-  });
-
-}]);
-```
+<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43#file-configblock-js"></script>
 
 ####Reacting to Notifications
 In a `run` block of your app, you can register with the push service to react
