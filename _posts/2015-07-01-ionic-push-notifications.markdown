@@ -94,7 +94,7 @@ You can get your private key from the [dashboard](https://apps.ionic.io/apps) as
 well, by selecting the settings of your app and viewing the Secret Key.
 
 The POST body will need to be in JSON format like the following:
-<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43#file-jsonformat-js"></script>
+<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43?file=jsonformat.js"></script>
 
 The tokens are the device tokens you want to send the notification to. The
 `alert` key is what will show up on the notification screen, and the payload
@@ -122,7 +122,7 @@ First you need to install a few extra components in your Ionic app using their
 `ionic add` and `ionic plugin` command line functions. From your app's directory
 in a terminal run the following commands:
 
-<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43#file-appsetupcommands-sh"></script>
+<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43?file=appsetupcommands.sh"></script>
 
 This will install the phonegap push notification plugin, Ionic's angular to
 cordova plugin framework, and Ionic's core and push services used to make
@@ -130,12 +130,12 @@ the rest of this a breeze.
 
 Then, open up your `index.html` page and add the following libraries to your
 `<head>` tag:
-<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43#file-scripttags-html"></script>
+<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43?file=scripttags.html"></script>
 
 Finally, you need to add those services to where you declare your angularjs
 module. It should look something like this:
 
-<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43#file-moduleadditions-js"></script>
+<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43?file=moduleadditions.js"></script>
 
 Please note that all these examples above were borrowed from
 [Ionic's documentation](http://docs.ionic.io/v1.0/docs/push-from-scratch).
@@ -173,7 +173,7 @@ and selecting your project and then clicking the Overview link will give you
 your GCM ID. It's the Project Number across the top.
 
 Your `config` block should look something like this:
-<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43#file-configblock-js"></script>
+<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43?file=configblock.js"></script>
 
 ####Reacting to Notifications
 In a `run` block of your app, you can register with the push service to react
