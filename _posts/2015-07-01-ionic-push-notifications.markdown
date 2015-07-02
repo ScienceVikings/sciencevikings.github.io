@@ -1,12 +1,11 @@
 ---
 layout: post
-title:  "Cordova Getting Started"
+title:  "Ionic Push Notifications"
 date:   2015-07-01 15:30:00
 categories: science ionic push-notifications
 author: Justin
 ---
 
-# Ionic Push Notifications
 So you have a sweet [Ionic](http://ionicframework.com/) app ready, but want to
 be able to push notifications to your users. The guys over at Drifty feel you
 and setup [Ionic Push](http://blog.ionic.io/announcing-ionic-push-alpha/) just
