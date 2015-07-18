@@ -62,7 +62,7 @@ Ionic template shows up with some crazy playlist thing. You'll notice that if yo
 JS files and saving them that the ionic server will reload automatically. Click around a bit and get a
 feel for the app as it stands. We'll gut it like a fish next.
 
-![Playlist](/images/ionic-intro/playlist.png)
+![Playlist](images/ionic-intro/playlist.PNG)
 
 # The Lay of the Land
 The side menu Ionic template provides a couple files for us and does some nice
