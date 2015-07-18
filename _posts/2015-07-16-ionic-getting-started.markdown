@@ -62,7 +62,7 @@ Ionic template shows up with some crazy playlist thing. You'll notice that if yo
 JS files and saving them that the ionic server will reload automatically. Click around a bit and get a
 feel for the app as it stands. We'll gut it like a fish next.
 
-![Playlist](images/ionic-intro/playlist.PNG)
+![Playlist](/images/ionic-intro/playlist.PNG)
 
 # The Lay of the Land
 The side menu Ionic template provides a couple files for us and does some nice
@@ -126,7 +126,7 @@ to the left, and reveal a refresh button to reload the data.
 
 <script src="https://gist.github.com/jbasinger/578ecd69413d452e884c.js?file=weather.html"></script>
 
-![Playlist](/images/ionic-intro/weather.png)
+![Playlist](/images/ionic-intro/weather.PNG)
 
 ## The Controller
 Here we need to setup some scope variables and functions to make all our buttons and inputs work. First
