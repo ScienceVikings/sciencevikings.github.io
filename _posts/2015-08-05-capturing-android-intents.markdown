@@ -39,7 +39,7 @@ Below is a snippet of what I added to the manifest file, and the completed file.
 
 <script src="https://gist.github.com/jbasinger/ea0d47fb82a47485e1ce.js?file=manifestsnippet.xml"></script>
 
-<script src="https://gist.github.com/jbasinger/ea0d47fb82a47485e1ce.js?file=manifestswhole.xml"></script>
+<script src="https://gist.github.com/jbasinger/ea0d47fb82a47485e1ce.js?file=manifestwhole.xml"></script>
 
 Within the snippet, you see the multiple tags `<intent-filter>`. You don't really need to make a separate tag for each intent filter unless you're handling specific things with different MIME types. I like to keep them separated regardless for general cleanliness.
 
