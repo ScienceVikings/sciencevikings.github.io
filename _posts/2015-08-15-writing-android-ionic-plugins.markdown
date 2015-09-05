@@ -10,6 +10,8 @@ Sometimes Cordova just doesn't have access to some libraries you'd have access t
 
 This is where plugins come in. Plugins are a way to interface native code with your hybrid solution, and today we'll talk about how to make our own.
 
+Here is a [github project](https://github.com/jbasinger/ReversePlugin) containing the working examples in this post.
+
 ## Required Items
 
 You need three things to make a Cordova Plugin:
