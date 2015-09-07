@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Creating a Slidebox Wizard with Ionic"
-date:   2015-08-15 19:40:00
+date:   2015-09-07 10:40:00
 categories: science ionic slidebox wizard
 author: Justin
 ---
