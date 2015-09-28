@@ -9,7 +9,7 @@ author: Justin
 I had this idea that it would be really cool to replicate the popout buttons that the Pinterest
 app has for use with Ionic. Below is a sample picture of the Pinterest app and it's buttons. Check out the code on GitHub [here](https://github.com/ScienceVikings/PopoutButtons).
 
-![Sorry about the poop thing.](/images/popout-buttons/pintrest.png)
+![Sorry about the poop thing.](/images/popout-buttons/pintrest-small.png)
 
 You tap a grid item, and 3 buttons pop out from your tap location so you can act on that item.
 I thought this would be really cool to replicate using Angular JS and CSS.
