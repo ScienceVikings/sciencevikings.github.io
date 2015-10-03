@@ -16,7 +16,7 @@ The first step we'll take, is to gather up all the files in our script's directo
 
 <script src="https://gist.github.com/RBoutot/45e76f0c60a8438ac8d6.js?file=GetFiles.py"></script>
 
-#####Walk-through:
+####Walk-through:
 
 * **Line 1**: We start by adding `import os` to the top of our script, giving us access to Python's built-in OS module. We'll need this for tasks like grabbing directories and determining their contents.
 * **Line 3**: This line has a lot going on, so I'll break it down into pieces
@@ -25,7 +25,7 @@ The first step we'll take, is to gather up all the files in our script's directo
   * `[item for item in os.listdir('.') if os.path.isfile(item)]`: Just one of the many ways to use [List Comprehensions](https://docs.python.org/2/tutorial/datastructures.html#list-comprehensions) in Python, this code reads out as "For each of the items in the directory, add it to the list if it's a file".
 * **Line 4**: A simple printing of the filename to the console
 
-#####Output:
+####Output:
 ![Get Files](/images/BasicFIM/GetFiles.png)
 
 ##Calculating the hash
@@ -33,7 +33,7 @@ There are many different types of hashes to chose from, all with varying speeds 
 
 <script src="https://gist.github.com/RBoutot/45e76f0c60a8438ac8d6.js?file=CalculateHash.py"></script>
 
-#####Walk-through:
+####Walk-through:
 
 * **Line 1**: Here, we add the `hashlib` module so we can access the hashing functions we'll need later.
 * **Line 4**: Creates a new instance of `hashlib`'s `md5()` class.
@@ -42,7 +42,7 @@ There are many different types of hashes to chose from, all with varying speeds 
 * **Line 7**: Using the byte chunks gathered from the previous line, we use the `hash`'s `update()` function to push the new chunk into the hash object.
 * **Line 8**: Generates the MD5 hash in hexadecimal format.
 
-#####Output:
+####Output:
 ![Calculate Hash](/images/BasicFIM/CalculateHash.png)
 
 ##Storing Hashes
@@ -50,12 +50,12 @@ So now that you've got your files hashed, it's time to put them some place where
 
 <script src="https://gist.github.com/RBoutot/45e76f0c60a8438ac8d6.js?file=StoreHash.py"></script>
 
-#####Walk-through:
+####Walk-through:
 
 * **Line 3**: Start by declaring a new variable, `files`, as an empty dictionary.
 * **Line 10**: Python loves to make things easy. This line is actually doing two things depending on whether or not the file has already been seen. If `file` is not currently a key in `files`, it is added with its value set to `md5`. If `file` *does* exist in the keys, its value is updated to the new hash.
 
-#####Output:
+####Output:
 ![Store Hash](/images/BasicFIM/StoreHash.png)
 
 ##Send a useful alert
@@ -63,7 +63,7 @@ Here's where you get to be creative! When it comes to alerting, you have a numbe
 
 <script src="https://gist.github.com/RBoutot/45e76f0c60a8438ac8d6.js?file=SendAlert.py"></script>
 
-#####Walk-through:
+####Walk-through:
 
 * **Line 1**: We need to import the `time` module in order to access some date/time information.
 * **Line 10**: To simplify this line, I'll break it down into pieces
@@ -78,11 +78,11 @@ Because we trust the baseline hashes and only want to be alerted when they chang
 
 <script src="https://gist.github.com/RBoutot/45e76f0c60a8438ac8d6.js?file=DetectChanges.py"></script>
 
-#####Walk-through:
+####Walk-through:
 
 * **Line 10**: If `file` exists in the keys of `files` (preventing alerts on the first run), and `md5` is not the same as `files[file]`'s value (the file has been changed), the alert will be triggered.
 
-#####Output:
+####Output:
 After this step, you shouldn't see anything! But that will change shortly...
 
 ##Continuously Monitor
@@ -90,12 +90,12 @@ So far, you've scanned your directory, picked out the files, collected their has
 
 <script src="https://gist.github.com/RBoutot/45e76f0c60a8438ac8d6.js?file=ContinuousMonitor.py"></script>
 
-#####Walk-through:
+####Walk-through:
 
 * **Line 4**: Creates a never-ending loop, rechecking our files with each iteration.
 * **Line 14**: After each iteration, we want to make sure to pause our monitoring. Without this pause, we would occasionally run into permission issues and crash the script.
 
-#####Output:
+####Output:
 ![Continuously Monitor](/images/BasicFIM/ContinuousMonitor.png)
 
 ##Conclusion
