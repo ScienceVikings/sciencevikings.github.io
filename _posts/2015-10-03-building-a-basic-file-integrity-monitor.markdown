@@ -70,8 +70,8 @@ Here's where you get to be creative! When it comes to alerting, you have a numbe
   * `time.strftime("%Y-%m-%d %H:%M:%S")`: Using the `time` module's `strftime()` function, we can pass it a string format for it to output. If you want to make your own format, or just learn more about `strftime()`, [check this out](https://docs.python.org/2/library/time.html#time.strftime)
   * `'%s\t%s has been changed!'%(string, string)`: This is just one of Python's many ways to [format a string](https://docs.python.org/2/library/string.html#format-examples). By replacing `%s` with string variables (`%d` for numbers), you can create strings cleanly ('no need'+' for '+'this').
 
-  #####Output:
-  ![Send Alert](/images/BasicFIM/SendAlert.png)
+####Output:
+![Send Alert](/images/BasicFIM/SendAlert.png)
 
 ##Detecting the change
 Because we trust the baseline hashes and only want to be alerted when they change, we need to add some sort of check to prevent our alert from always going off.
