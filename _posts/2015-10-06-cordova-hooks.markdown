@@ -47,7 +47,7 @@ In each of those files, create an AngularJS constant similar to the following:
 
 We're going to copy one of those files, depending on the passed parameter to the command line, to the file `www/js/config.js`.
 To make sure we can use this constant, add `config.js` to your `index.html` file, and in the `controllers.js` file include the
-`constants` module in the `starter.controllers` module.
+`constants` module in the `starter.controllers` module. Now you can use `ENV` in your controllers and services.
 
 Now, we'll just create a script in our `hooks` base directory, not in any subdirectory, named `updateConfig.js`
 
@@ -59,7 +59,7 @@ system where to find the file to run.
 
 Now, the contents of the file is going to be a bit different than our after build hook. When defining a hook from the `config.xml` file, you're actually exporting a function that Cordova will call.
 
-Cordova will pass a parameter to your function called `context`. This lets you have access to far more properies about your project than you have by just putting a .js file in a subdirectory.
+Cordova will pass a parameter to your function called `context`. This lets you have access to far more properies about your project than you have by just putting a .js file in a subdirectory. Fire off a `console.log(context)` to see the magic happen.
 
 You can pass parameters to your Cordova build command line calls by prefixing them with `--`. For example, in our script, if we wanted to do a production level build, we'd use the command `cordova build android --prod`.
 
