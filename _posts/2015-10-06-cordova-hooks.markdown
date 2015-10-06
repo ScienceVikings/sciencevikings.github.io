@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Cordova Hooks"
-date:   2015-09-22 10:40:00
+date:   2015-10-06 10:40:00
 categories: science cordova hooks mobile hybrid
 author: Justin
 ---
