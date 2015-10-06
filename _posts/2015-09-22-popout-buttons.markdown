@@ -2,7 +2,7 @@
 layout: post
 title:  "Creating Popout Buttons for Ionic"
 date:   2015-09-22 10:40:00
-categories: science ionic popout button
+categories: science ionic popout button directive mobile hybrid
 author: Justin
 ---
 

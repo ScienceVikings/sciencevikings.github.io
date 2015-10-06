@@ -2,7 +2,7 @@
 layout: post
 title:  "Writing Ionic Plugins with Android"
 date:   2015-08-15 19:40:00
-categories: science ionic plugin
+categories: science ionic cordova plugin mobile hybrid
 author: Justin
 ---
 

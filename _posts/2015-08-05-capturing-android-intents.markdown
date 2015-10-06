@@ -2,7 +2,7 @@
 layout: post
 title:  "Capturing Android Intents with Cordova"
 date:   2015-08-05 08:40:00
-categories: science ionic
+categories: science ionic android intents mobile hybrid
 author: Justin
 ---
 
