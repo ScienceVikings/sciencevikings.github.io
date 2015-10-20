@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Setting Up Karma for Ionic"
-date:   2015-10-06 10:40:00
+date:   2015-10-17 10:40:00
 categories: ionic karma unit-testing
 author: Justin
 ---
