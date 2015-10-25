@@ -233,4 +233,8 @@
             font-size: 18px;
         }
     }
+
+    div.gist {
+      @include media-query($on-laptop) {}
+    }
 }
