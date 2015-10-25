@@ -1,12 +1,42 @@
 # Site settings
-title: Science Viking Labs
-email: justin.m.basinger@gmail.com
-description: > # this means to ignore newlines until "baseurl:"
-  Growing beards and automating the world.
+description: A blog about lorem ipsum dolor sit amet
 baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://sciencevikinglabs.com" # the base hostname & protocol for your site
-#twitter_username: jekyllrb
+url: "http://rboutot.github.io/" # the base hostname & protocol for your site
+
+# User settings
+username: Lorem Ipsum
+user_description: Anon Developer at Lorem Ipsum Dolor
+user_title: Anon Developer
+email: ScienceVikingLabs@Gmail.com
+twitter_username: lorem_ipsum
 github_username:  ScienceVikings
+gplus_username:  lorem_ipsum
+disqus_username: lorem_ipsum
 
 # Build settings
 markdown: kramdown
+highlighter: pygments
+permalink: /:title/
+
+
+# html minify
+compress_html:
+  clippings: all
+  comments: all
+  endings: []
+  profile: false
+
+# Links to include in menu navigation
+# For external links add external: true
+links:
+  - title: Home
+    url: /
+  - title: Series
+    url: /series
+  - title: Tags
+    url: /tags
+  - title: About Me
+    url: /about
+
+# exclude my node related stuff
+exclude: ['package.json', 'src', 'node_modules']
