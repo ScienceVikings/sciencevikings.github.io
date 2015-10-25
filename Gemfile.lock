@@ -1,7 +1,6 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    RedCloth (4.2.9)
     RedCloth (4.2.9-x86-mingw32)
     activesupport (4.1.7)
       i18n (~> 0.6, >= 0.6.9)
@@ -44,7 +43,7 @@ GEM
     github-pages-health-check (0.1.1)
       net-dns (~> 0.6)
       public_suffix (~> 1.4)
-    hitimes (1.2.2)
+    hitimes (1.2.2-x86-mingw32)
     html-pipeline (1.9.0)
       activesupport (>= 2)
       nokogiri (~> 1.4)
@@ -119,7 +118,6 @@ GEM
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
     wdm (0.1.0)
-    yajl-ruby (1.1.0)
     yajl-ruby (1.1.0-x86-mingw32)
 
 PLATFORMS
@@ -128,3 +126,6 @@ PLATFORMS
 DEPENDENCIES
   github-pages
   wdm (>= 0.1.0)
+
+BUNDLED WITH
+   1.10.1
