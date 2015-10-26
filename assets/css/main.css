@@ -276,7 +276,7 @@ a.slideButton, .dosearch {
 }
 .dosearch {
   right: 10px;
-  background: #0558c6;
+  background: #000000;
   border-radius: .1875rem;
   padding: .125rem .1875rem
 }
@@ -1478,7 +1478,7 @@ footer a:hover {
 }
 .svl-logo{
   max-width: 50%;
-  max-height: 500px;
+  max-height: 400px;
 }
 .svl-logo-mini{
   max-width:200px;
