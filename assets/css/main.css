@@ -550,10 +550,16 @@ body.search-overlay:after {
 html, body {
   height: 100%
 }
-.header-site, .header-post {
+.header-site {
   background: #000000;
   height: 100%;
 }
+
+.header-post {
+  background: #000000;
+  height: 35%;
+}
+
 .header-site .content, .header-post .content {
   width: 95%;
   position: absolute;
@@ -566,6 +572,20 @@ html, body {
   transform: translate(-50%, -50%);
   text-align: center
 }
+
+.header-post .content {
+  width: 95%;
+  position: absolute;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  top: 20%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  text-align: center
+}
+
 .header-site h1, .header-site h2 {
   color: #fff;
   text-align: center
