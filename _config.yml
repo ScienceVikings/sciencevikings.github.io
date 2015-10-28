@@ -2,6 +2,7 @@
 description: A blog about lorem ipsum dolor sit amet
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://www.sciencevikinglabs.com" # the base hostname & protocol for your site
+title: Science Viking Labs
 
 # User settings
 username: Science Viking Labs
