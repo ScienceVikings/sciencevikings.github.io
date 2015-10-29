@@ -1,7 +1,8 @@
 # Site settings
-description: A blog about lorem ipsum dolor sit amet
+description: "Beards and Code."
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://www.sciencevikinglabs.com" # the base hostname & protocol for your site
+title: "The Science Viking Labs Blog"
 
 # User settings
 username: Science Viking Labs
