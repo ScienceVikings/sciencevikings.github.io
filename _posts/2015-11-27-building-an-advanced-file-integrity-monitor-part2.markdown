@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Building an advanced File Integrity Monitor - Part 2"
-date:   2015-11-18 20:15:00
+date:   2015-11-27 11:20:00
 categories: Security Python "File Integrity Monitor"
 author: Ryan
 ---
