@@ -23,6 +23,7 @@ Because of these issues, MD5 is not recommended for use in secure systems, or in
 SHA-256 is part of the Secure Hashing Algorithm family and is considered to be the new standard in hashing.
 
 Check out the hashes generated for the string "Science Vikings":
+
 * MD5: 8aecf444e829fd7717cd4c3ad57f80c1
 * SHA-256: 55168a73fd9e98e5fef9ae8fe615cf78445613d384ffe4a4b01a812f78975451
 
