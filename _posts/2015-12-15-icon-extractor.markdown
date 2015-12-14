@@ -79,4 +79,4 @@ In my previous [post](% post_url 2015-11-13-talking-to-processes-with-node %) I 
 
 As far as speed is concerned, I haven't personally benchmarked anything. The speed of doing this works well enough for my needs at the moment.
 
-I know other solutions for using .Net code in NodeJS exist with projects like [Edge.js]([post](% post_url 2015-11-13-talking-to-processes-with-node %) but again, if you don't need absolute real-time speed, the complexity level of incorporating .Net code right into your NodeJS application might not be worth it.
+I know other solutions for using .Net code in NodeJS exist with projects like [Edge.js](http://tjanczuk.github.io/edge/) but again, if you don't need absolute real-time speed, the complexity level of incorporating .Net code right into your NodeJS application might not be worth it.
