@@ -249,6 +249,7 @@ PLATFORMS
 
 DEPENDENCIES
   github-pages
+  jekyll-gist
   wdm (>= 0.1.0)
 
 BUNDLED WITH
