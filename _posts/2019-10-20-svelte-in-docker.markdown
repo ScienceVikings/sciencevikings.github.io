@@ -22,9 +22,9 @@ First, Svelte only loaded up for localhost. This doesn't fly in container land b
 
 Now for live reloading. Through tireless research, I figured out by searching through bugs in their GitHub page that I could use `chokidar` as a Live Reload tool.
 
-There is some odd debate about using `chokidar` as the main reload library because of it's size and such, but it looks like it should be mainstream soon, hopefully rendering this part obsolete in the near future. Problem solved!
+There is some odd debate about using [`chokidar`](https://github.com/paulmillr/chokidar) as the main reload library because of it's size and such, but it looks like it should be mainstream soon. Hopefully that will render this part obsolete in the near future. Problem solved!
 
-This is all great, but looking back, I had to change a bunch of weird things in their template and add a `Dockerfile` and `docker-compose.yaml` which I'd need for every new project. So, I forked their template and updated it so that it would be easier for everyone else wanting to just get in there and try some Svelte. I have a single Docker command that will initialize a project for you. Here is the [repo](https://github.com/ScienceVikings/svelte-template).
+This is all great, but looking back, I had to change a bunch of weird things in their template, then add a `Dockerfile` and `docker-compose.yaml` which I'd need for every new project. So, I forked their template and updated it so that it would be easier for everyone else wanting to just get in there and try some Svelte. I also have a single Docker command that will initialize a project for you. Here is the [repo](https://github.com/ScienceVikings/svelte-template).
 
 Once they decide on a live reload tool and merge it in, I'll offer a pull request with Docker things. Until then, just follow the instructions on the SVL template fork and you should be good to go.
 
