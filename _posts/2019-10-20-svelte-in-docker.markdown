@@ -20,9 +20,9 @@ Any normal person would've given up there, but I wasn't going to be defeated so 
 
 First, Svelte only loaded up for localhost. This doesn't fly in container land because you need to map ports and the container needs bind to the outside world. So I added `--host 0.0.0.0` to the `package.json` file where the Svelte cli did work and that solved the connection problem.
 
-Now for live reloading. Through tireless research, I figured out by searching through bugs in their GitHub page that I could use `chokidar` as a Live Reload tool.
+Now for live reloading. Through tireless research, I figured out by searching through bugs in their GitHub page that I could use [`chokidar`](https://github.com/paulmillr/chokidar) as a Live Reload tool.
 
-There is some odd debate about using [`chokidar`](https://github.com/paulmillr/chokidar) as the main reload library because of it's size and such, but it looks like it should be mainstream soon. Hopefully that will render this part obsolete in the near future. Problem solved!
+There is some odd debate about using `chokidar` as the main reload library because of it's size and such, but it looks like it should be mainstream soon. Hopefully that will render this part obsolete in the near future. Problem solved!
 
 This is all great, but looking back, I had to change a bunch of weird things in their template, then add a `Dockerfile` and `docker-compose.yaml` which I'd need for every new project. So, I forked their template and updated it so that it would be easier for everyone else wanting to just get in there and try some Svelte. I also have a single Docker command that will initialize a project for you. Here is the [repo](https://github.com/ScienceVikings/svelte-template).
 
