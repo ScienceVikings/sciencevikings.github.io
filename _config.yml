@@ -13,8 +13,8 @@ twitter_username: ScienceVikings
 github_username:  ScienceVikings
 gplus_username:  lorem_ipsum
 disqus_username: lorem_ipsum
-author: {'Justin': {'description': 'Hybrid/Mobile Developer, Beard Enthusiast','email': 'Justin.M.Basinger@Gmail.com','image': '/assets/img/Justin.jpeg','name': 'Justin Basinger'},
-         'Ryan': {'description': 'Security Researcher, Software Developer, Beer Enthusiast','email': 'BoutotR@Gmail.com','image': '/assets/img/Ryan.jpg','name': 'Ryan Boutot'}}
+author: {'Justin': {'description': 'Full Stack Software Engineer, DevOps Engineer, Beard Enthusiast','email': 'justin@sciencevikinglabs.com','image': '/assets/img/Justin.jpeg','name': 'Justin Basinger'},
+         'Ryan': {'description': 'Offensive Security Engineer, Full Stack Software Engineer, Beer Enthusiast','email': 'ryan@sciencevikinglabs.com','image': '/assets/img/Ryan.jpg','name': 'Ryan Boutot'}}
 
 # Build settings
 markdown: kramdown
