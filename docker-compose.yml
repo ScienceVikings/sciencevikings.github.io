@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+
+  blog:
+    container_name: svl-blog
+    build: .
+    ports:
+      - "8100:4000"
+    volumes:
+      - "./:/app"
+    stdin_open: true
+
+  cli: # docker-compose run cli
+    container_name: svl-blog-cli
+    build: .
+    ports:
+      - "4004:4000"
+    volumes:
+      - "./:/app"
+    stdin_open: true
+    tty: true
+    entrypoint: "/bin/bash"
