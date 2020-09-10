@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Developing Svelte in Docker"
-date:   2018-12-30 12:39:00
+date:   2019-10-20 12:39:00
 categories: sveltejs docker
 author: Justin
 ---
