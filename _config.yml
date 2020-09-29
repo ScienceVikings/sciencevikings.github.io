@@ -20,7 +20,7 @@ author: {'Justin': {'description': 'Full Stack Software Engineer, DevOps Enginee
 markdown: kramdown
 highlighter: pygments
 permalink: /:title/
-
+future: false
 
 # html minify
 compress_html:
