@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Building a File Integrity Monitor - Part 3"
-date:   2020-10-05 12:00:00
+date:   2020-10-05 00:00:00
 categories: Security Python "File Integrity Monitor"
 author: Ryan
 ---
