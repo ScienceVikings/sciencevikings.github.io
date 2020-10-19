@@ -3,4 +3,4 @@ WORKDIR /app
 COPY . .
 RUN gem install bundler \
   && bundle install
-ENTRYPOINT ["bundle", "exec", "jekyll", "serve"]
+ENTRYPOINT ["bundle", "exec", "jekyll", "serve", "--watch", "--force_polling", "--livereload"]

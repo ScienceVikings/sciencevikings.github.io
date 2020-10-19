@@ -260,6 +260,7 @@ PLATFORMS
 DEPENDENCIES
   github-pages
   jekyll-gist
+  jekyll-watch
 
 BUNDLED WITH
    2.1.4
