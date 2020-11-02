@@ -8,7 +8,7 @@ author: Ryan
 
 Last month, we posted a guide on how to make your very own [Basic File Integrity Monitor](http://sciencevikinglabs.com/building-a-basic-file-integrity-monitor/). In this six-part series, you'll be taking what you learned and replacing simple components with more advanced, realistic counterparts. This first post is all about gathering the files you'll need for monitoring.
 
-**Note:** If you don't already have you basic FIM set up, follow the link above before continuing.
+**Note:** If you don't already have your basic FIM set up, follow the link above before continuing.
 
 
 ## Declaring Paths and Scan types
