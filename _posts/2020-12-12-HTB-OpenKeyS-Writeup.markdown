@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Hack The Box - OpenKeyS Writeup"
-date:   2020-11-12 06:00:00
+date:   2020-12-12 06:00:00
 categories: Security CTF HTB"
 author: Ryan
 ---
