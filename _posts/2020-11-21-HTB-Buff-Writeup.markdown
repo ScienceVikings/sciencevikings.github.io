@@ -6,7 +6,7 @@ categories: Security CTF HTB"
 author: Ryan
 ---
 
-*[Hack The Box](hackthebox.eu) is an online platform allowing you to test your penetration testing skills and exchange ideas and methodologies with thousands of people in the security field.*  
+*[Hack The Box](https://hackthebox.eu) is an online platform allowing you to test your penetration testing skills and exchange ideas and methodologies with thousands of people in the security field.*  
 ![HTB - Buff](../images/HTB-Buff/Header.png)
 
 Buff is an Easy level Windows machine. The box statistics show us that we will be focusing heavily on existing CVEs, while working on enumeration skills in a somewhat realistic setup.  
