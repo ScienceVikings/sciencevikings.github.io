@@ -33,10 +33,17 @@ Lets kick off a scan using Gobuster. This will allow us to enumerate any paths a
 `>> gobuster dir -u http://10.10.10.199 -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -x php,txt -t 100`  
 ![Gobuster](../images/HTB-OpenKeyS/Info_Gobuster.png)
 
-Navigating to [10.10.10.199/includes](http://10.10.10.199/includes) shows us a directory containing two files, [auth.php](http://10.10.10.199/includes/auth.php), and [auth.php.swp](http://10.10.10.199/includes/auth.php.swp). The contents of the latter discloses the username "jennifer", Perhaps this is the username we need to login?
+Navigating to [10.10.10.199/includes](http://10.10.10.199/includes) shows us a directory containing two files, [auth.php](http://10.10.10.199/includes/auth.php), and [auth.php.swp](http://10.10.10.199/includes/auth.php.swp). Looking at the details of the latter discloses the username "jennifer", perhaps this is the username we need to login?  
+![File Command](../images/HTB-OpenKeyS/Info_File.png)
+
+### Code Review
+In addition to the username, we also learn that the file originated in Vim. By loading the file in recovery mode, we're able to read its contents and learn more about how the application handles its auth.  
+![Auth Code](../images/HTB-OpenKeyS/Info_Code.png)
+
+The piece worth looking at here is in the `init_session()` function, where it's setting the session username with `$_REQUEST['username']`. This tells the server to retrieve the value of `username` from not only the body of the request, but also from the cookies.
 
 ### Searching for vulnerabilities
-The fact that most boxes on Hack The Box are Windows and Linux-based makes the creator's OpenBSD choice a little suspicious. After focusing on vulnerabilities around OpenBSD, one particular [article](https://www.qualys.com/2019/12/04/cve-2019-19521/authentication-vulnerabilities-openbsd.txt) stands out. It appears that by substituting a username with `-schallenge`, we're able to bypass the authentication. Let's try it out:  
+The fact that most boxes on Hack The Box are Windows and Linux-based makes the creator's OpenBSD choice a little suspicious. After focusing on vulnerabilities around authentication in OpenBSD, one particular [article](https://www.qualys.com/2019/12/04/cve-2019-19521/authentication-vulnerabilities-openbsd.txt) stands out. It appears that by substituting a username with `-schallenge`, we're able to bypass the authentication. Let's try it out:  
 ![SChallenge](../images/HTB-OpenKeyS/Info_SChallenge.png)
 
 Interesting, while our bypass seems to have worked, there is no OpenSSH Key found for our user.
@@ -44,7 +51,7 @@ Interesting, while our bypass seems to have worked, there is no OpenSSH Key foun
 ## Foothold
 
 ### Traffic Manipulation
-Knowing we have a way to bypass the authentication, and a potential username, let's intercept the request in Burpsuite and modify it. Burpsuite is a tool for proxying, manipulating, and scanning web traffic making it extremely beneficial to use when tinkering with requests. Here, we've intercepted our -schallenge request, and added a username cookie with the value set to jennifer.  
+Knowing we have a way to bypass the authentication, and a potential username, let's intercept the request in Burpsuite and modify it. Burpsuite is a tool for proxying, manipulating, and scanning web traffic making it extremely beneficial to use when tinkering with requests. Here, we've intercepted our -schallenge request, and added a username cookie with the value set to jennifer. This should combine our authentication bypass with the `$_REQUEST['username']` weakness we discovered earlier.  
 ![Cookie](../images/HTB-OpenKeyS/Foothold_Cookie.png)
 
 Success! Forwarding that manipulated traffic results in tricking the server into sending us back the OpenSSH Key for Jennifer.  
