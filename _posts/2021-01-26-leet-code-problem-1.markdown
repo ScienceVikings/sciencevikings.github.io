@@ -14,7 +14,8 @@ Today we're going to be sharpening the axe a bit and doing the first [LeetCode](
 The questions available are used by large tech companies as interview questions, so it's a good place to start and the difficulty of the questions being Easy, Medium or Hard.
 
 While the solutions for these problems are available directly from the site, they are directly to the point and can be a bit technical. I'd like to use these types of posts
-to explain the thought process to get to the solution, and how to think about and test for edge cases.
+to explain the thought process to get to the solution, and how to think about and test for edge cases. I'll be using C# in dotnet to create my solution.
+Download [Visual Studio](https://visualstudio.microsoft.com/vs/community/) for free to create your own.
 
 ### The Problem
 
