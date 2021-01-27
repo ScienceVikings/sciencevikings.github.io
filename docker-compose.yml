@@ -4,6 +4,7 @@ services:
   blog:
     container_name: svl-blog
     build: .
+    image: svl_blog
     ports:
       - "8100:4000"
     volumes:
