@@ -8,7 +8,7 @@ author: Justin
 
 ## LeetCode Problem 1 - Two Sum
 
-Today we're going to be sharpening the axe a bit and doing the first [LeetCode](https://leetcode.com/problems/two-sum/) problem.
+Today we're going to be sharpening the axe a bit and doing the first [LeetCode](https://leetcode.com/problems/two-sum/) problem. You can find my code for all my LeetCode submissions at [GitHub](https://github.com/jbasinger/LeetCode).
 
 [LeetCode](https://leetcode.com/) is a site that provides programming problems for practice. A lot of developers use it to hone their skills or to practice for upcoming interviews.
 The questions available are used by large tech companies as interview questions, so it's a good place to start and the difficulty of the questions being Easy, Medium or Hard.
@@ -94,5 +94,4 @@ The best part is that you can make sure you don't break something you didn't thi
 ### Conclusion
 
 In the end, this problem is pretty straight forward if you go through it the brute force way. There are certainly other ways of solving this problem, but I mostly
-wanted to show how to setup the problem and think about unit testing to be more confident in your code. I hope this was helpful and look forward to more problem
-solutions in the future.
+wanted to show how to setup the problem and think about unit testing to be more confident in your code. Again, you can find all my LeetCode submissions at [GitHub](https://github.com/jbasinger/LeetCode). I hope this was helpful and look forward to more problem solutions in the future.
