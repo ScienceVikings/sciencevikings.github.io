@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Hack The Box - Worker Writeup"
-date:   2021-01-09 06:00:00
+date:   2021-01-30 06:00:00
 categories: Security CTF HTB"
 author: Ryan
 ---
@@ -21,7 +21,7 @@ By scanning the target IP with Nmap, we're able to find what ports are open (`-p
 
 * **Port 80 - HTTP**: A basic IIS websever that doesn't immediately appear to be hosting content. We'll need to look around more for the proper hostnames to use.
 * **Port 3690 - svnserve**: SVN, or [Subversion](https://subversion.apache.org/faq.html#why), is an open-source, centralized version control system. We can start looking here for any open files/directories to dig through.
-* **Port 5985 - HTTP**: Although nmap shows this port is hosting some type of HTTP server, port 5985 is also used for [WinRM](https://docs.microsoft.com/en-us/windows/win32/winrm/portal). If we're able to find credentials, it's posible this will be our way into the machine.
+* **Port 5985 - HTTP**: Although nmap shows this port is hosting some type of HTTP server, port 5985 is also used for [WinRM](https://docs.microsoft.com/en-us/windows/win32/winrm/portal). If we're able to find credentials, it's possible this will be our way into the machine.
 
 ### Subversion
 Using the SVN CLI tool, let's connect to the server and list out the directories and files available.   

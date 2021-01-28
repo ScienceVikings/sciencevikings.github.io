@@ -1,1 +1,1 @@
-bundle exec jekyll serve --watch --force_polling --livereload --future
+bundle exec jekyll serve --watch --force_polling --future

