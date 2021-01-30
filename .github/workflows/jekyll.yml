@@ -1,6 +1,9 @@
 name: Jekyll Daily Rebuild
 
 on:
+  push:
+    branches:
+      - master
   schedule:
     - cron: "* * * * *"
 
