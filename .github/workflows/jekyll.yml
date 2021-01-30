@@ -2,7 +2,7 @@ name: Jekyll Daily Rebuild
 
 on:
   schedule:
-    - cron: "0 1,13 * * *"
+    - cron: "* * * * *"
 
 jobs:
   refresh:
