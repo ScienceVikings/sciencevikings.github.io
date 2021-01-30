@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Hack The Box - Worker Writeup"
-date:   2021-01-30 06:00:00
+date:   2021-01-30 00:00:00
 categories: Security CTF HTB"
 author: Ryan
 ---
