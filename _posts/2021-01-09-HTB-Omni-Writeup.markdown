@@ -15,7 +15,7 @@ Omni is an Easy level "Other" machine. Boxes typically fall under the "Linux" or
 ## Information Gathering
 
 #### Nmap:
-By scanning the target IP with Nmap, we're able to find what ports are open (`-p`), while fingerprinting the services running and their versions (`-sV`). We're also running the default set of scripts (`-sC`), which can help find additional information and automate some of our initial steps. Once the scan is completed, nmap with write the results to our Extracts folder (`-oA`)  
+By scanning the target IP with Nmap, we're able to find what ports are open (`-p`), while fingerprinting the services running and their versions (`-sV`). We're also running the default set of scripts (`-sC`), which can help find additional information and automate some of our initial steps. Once the scan is completed, nmap will write the results to our Extracts folder (`-oA`)  
 `>> nmap -p135,5985,8080,29817,29819,29820 -sV -sC -Pn -oA Extracts/Omni 10.10.10.204`  
 ![Nmap](../images/HTB-Omni/nmap.png)
 

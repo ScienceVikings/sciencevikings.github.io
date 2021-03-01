@@ -15,7 +15,7 @@ Doctor is an Easy level linux machine. Based on the creator and community statis
 ## Information Gathering
 
 #### Nmap:
-By scanning the target IP with Nmap, we're able to find what ports are open (`-p`), while fingerprinting the services running and their versions (`-sV`). We're also running the default set of scripts (`-sC`), which can help find additional information and automate some of our initial steps. Once the scan is completed, nmap with write the results to our Extracts folder (`-oA`)  
+By scanning the target IP with Nmap, we're able to find what ports are open (`-p`), while fingerprinting the services running and their versions (`-sV`). We're also running the default set of scripts (`-sC`), which can help find additional information and automate some of our initial steps. Once the scan is completed, nmap will write the results to our Extracts folder (`-oA`)  
 `>> nmap -p22,80,8089 -sV -sC -oA Extracts/Doctor 10.10.10.209`  
 ![Nmap](../images/HTB-Doctor/nmap.png)
 

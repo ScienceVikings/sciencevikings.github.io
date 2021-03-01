@@ -15,7 +15,7 @@ Worker is a Medium level Windows machine. Based on the creator and community sta
 ## Information Gathering
 
 #### Nmap:
-By scanning the target IP with Nmap, we're able to find what ports are open (`-p`), while fingerprinting the services running and their versions (`-sV`). We're also running the default set of scripts (`-sC`), which can help find additional information and automate some of our initial steps. Once the scan is completed, nmap with write the results to our Extracts folder (`-oA`)  
+By scanning the target IP with Nmap, we're able to find what ports are open (`-p`), while fingerprinting the services running and their versions (`-sV`). We're also running the default set of scripts (`-sC`), which can help find additional information and automate some of our initial steps. Once the scan is completed, nmap will write the results to our Extracts folder (`-oA`)  
 `>> nmap -p80,3690,5985 -sC -sV -oA Extracts/Worker 10.10.10.203`  
 ![Nmap](../images/HTB-Worker/nmap.png)
 

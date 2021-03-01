@@ -15,7 +15,7 @@ Jewel is an Medium level linux machine. Based on the creator and community stati
 ## Information Gathering
 
 #### Nmap:
-By scanning the target IP with Nmap, we're able to find what ports are open (`-p`), while fingerprinting the services running and their versions (`-sV`). We're also running the default set of scripts (`-sC`), which can help find additional information and automate some of our initial steps. Once the scan is completed, nmap with write the results to our Extracts folder (`-oA`)  
+By scanning the target IP with Nmap, we're able to find what ports are open (`-p`), while fingerprinting the services running and their versions (`-sV`). We're also running the default set of scripts (`-sC`), which can help find additional information and automate some of our initial steps. Once the scan is completed, nmap will write the results to our Extracts folder (`-oA`)  
 `>> nmap -Pn -p22,8000,8080 -sC -sV -oA Extracts/Jewel 10.10.10.211`  
 ![Nmap](../images/HTB-Jewel/nmap.png)
 
