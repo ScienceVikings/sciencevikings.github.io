@@ -9,7 +9,7 @@ vikings:
     github:          sciencevikings
     email:           blog@sciencevikinglabs.com
 
-ryan:
+Ryan:
   name:              Ryan Boutot
   email:             ryan@sciencevikinglabs.com
 
@@ -71,7 +71,7 @@ ryan:
     # keybase          <username>
 
 # Another author (optional)
-justin:
+Justin:
   name:              Justin Basinger
   email:             justin@sciencevikinglabs.com
   about:             |
