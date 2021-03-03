@@ -1,29 +1,45 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-    {% include head.html %}
-    <body>
-        {% include svg-icons.html %}
-        {% include header-post.html %}
-        <section class="post" itemscope itemtype="http://schema.org/BlogPosting">
+---
+# Copyright (c) 2018 Florian Klampfer <https://qwtel.com/>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-            <article role="article" id="scroll" class="post-content" itemprop="articleBody">
-                {{ content }}
-            </article>
+layout: base
+---
 
-            {% include share.html %}
-            {% include author.html %}
-            <!-- {% include comments.html %} -->
-            {% include footer.html %}
-        </section>
-    </body>
-</html>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+{% assign version = jekyll.version | split:'.' %}
+{% assign major = version[0] | plus:0 %}
+{% assign minor = version[1] | plus:0 %}
+{% assign patch = version[2] | plus:0 %}
 
-  ga('create', 'UA-58180882-1', 'auto');
-  ga('send', 'pageview');
+{% include_cached components/post.html post=page no_link_title=true no_excerpt=true hide_image=page.hide_image hide_description=page.hide_description %}
 
-</script>
+{% include components/dingbat.html %}
+
+{% assign addons = page.addons | default:site.hydejack.post_addons %}
+{% unless addons %}{% assign addons = "about,newsletter,related,random" | split:"," %}{% endunless %}
+{% for addon in addons %}
+  {% case addon %}
+  {% when 'about' %}
+     {% include_cached components/about.html author=page.author %}
+  {% when 'newsletter' %}
+    {% include if-non-null try="pro/newsletter.html" %}
+  {% when 'related' %}
+    {% include if-non-null try="pro/related-posts.html" fallback="components/related-posts.html" %}
+  {% when 'random' %}
+    {% include if-non-null try="pro/random-posts.html" %}
+  {% when 'comments' %}
+    {% include body/comments.html %}
+  {% else %}
+  {% endcase %}
+{% endfor %}
