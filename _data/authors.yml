@@ -1,6 +1,14 @@
 # The primary author of this blog.
 # Must be the same as `author` in `_config.yml`.
 # Change `author1` to your shortname.
+vikings:
+  name:              Science Vikings
+  email:             blog@sciencevikinglabs.com
+  social:
+    twitter:         sciencevikings
+    github:          sciencevikings
+    email:           blog@sciencevikinglabs.com
+
 ryan:
   name:              Ryan Boutot
   email:             ryan@sciencevikinglabs.com
@@ -24,7 +32,7 @@ ryan:
   social:
     twitter:         sciencevikings
     github:          RBoutot
-    # email:           <mail@domain.tld>
+    email:           ryan@sciencevikinglabs.com
     # rss:             https://<url>/feed.xml
     # facebook:        <username>
     # google:          <number>
@@ -67,12 +75,19 @@ justin:
   name:              Justin Basinger
   email:             justin@sciencevikinglabs.com
   about:             |
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    Full Stack Software Engineer, DevOps Engineer, Beard Enthusiast
 
-    Open `_data/authors.yml` to edit this text.
+  picture:
+    path:            /assets/img/authors/justin.jpeg
+    # srcset is optional, but can be used to provide higher res versions for retina displays
+    # srcset:
+    #   1x:            https://placehold.it/128x128
+    #   2x:            https://placehold.it/256x256
 
-  picture:           https://placehold.it/128x128
-  twitter:           <username>
-  github:            <username>
+  # Social media icons in sidebar
+  # Comment/uncommet to show/hide
+  # Rearrange to change the order in which they appear
+  social:
+    twitter:         basingiorno
+    github:          jbasinger
+    email:           justin@sciencevikinglabs.com
