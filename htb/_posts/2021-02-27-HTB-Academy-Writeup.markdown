@@ -4,8 +4,11 @@ title:  "Hack The Box - Academy Writeup"
 image: 
   path: /assets/img/htb/HTB-Academy/Header.png
 date:   2021-02-27 06:00:00
-author: Ryan
+author: Justin
 ---
+
+- Table of Contents
+{:toc .large-only}
 
 *[Hack The Box](https://hackthebox.eu) is an online platform allowing you to test your penetration testing skills and exchange ideas and methodologies with thousands of people in the security field.*  
 
