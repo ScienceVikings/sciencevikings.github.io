@@ -3,6 +3,8 @@ layout: post
 title:  "Setting Up Karma for Ionic"
 date:   2015-10-17 10:40:00
 author: Justin
+image:
+  path: /assets/img/mobile_hybrid/unit-testing-ionic/header.jpg
 ---
 
 Unit testing! The wonderful thing everyone wants to do but never does.
@@ -56,7 +58,14 @@ angular itself to be run in a testing setting. A must have for angular unit test
 
 Here is an example of my `files` field in my configuration file.
 
-<script src="https://gist.github.com/jbasinger/877d3608d4dd37fa1b0b.js?file=files.js"></script>
+```js
+files: [
+  '../lib/ionic/js/ionic.bundle.js',
+  '../lib/angular-mocks/angular-mocks.js',
+  '../js/**.js',
+  './**.spec.js'
+],
+```
 
 # Running the tests
 This part is the easiest part. Since you're in the directory of your config file just fire off the following command:
@@ -71,12 +80,30 @@ to organize your tests, and `it` functions to explain what it should be doing.
 
 It's best to decribe with an example. Here is a Pizza class I made to show a trivial unit test:
 
-<script src="https://gist.github.com/jbasinger/877d3608d4dd37fa1b0b.js?file=pizza.js"></script>
+```js
+function Pizza(slices){
+  this.slices = slices || 8;
+}
+```
 
 Simple right? A default pizza comes in 8 slices, but you can override the number you want.
 Now here are the tests showing how to make sure this class functions like we want.
 
-<script src="https://gist.github.com/jbasinger/877d3608d4dd37fa1b0b.js?file=pizzaTest.js"></script>
+```js
+describe('Pizza', function(){
+
+  it("should default to 8 slices", function(){
+    var p = new Pizza();
+    expect(p.slices == 8);
+  });
+
+  it("should let me override the number of slices", function(){
+    var p = new Pizza(12);
+    expect(p.slices == 12);
+  });
+
+});
+```
 
 Pretty simple stuff. Unfortunately, the real world isn't as simple and I don't want to leave you with
 a trivial example and send you off to unit test something like a web service call.
@@ -84,12 +111,69 @@ a trivial example and send you off to unit test something like a web service cal
 Lets assume we want to order the new pizza we just made over the internet, because the future is now.
 Here is the pizza service I created to do just that:
 
-<script src="https://gist.github.com/jbasinger/877d3608d4dd37fa1b0b.js?file=pizzaService.js"></script>
+```js
+angular.module('starter.services', [])
+
+.factory('Pizza', function($http){
+  return {
+    orderPizza: function(pizza){
+      return $http.post('/order',pizza);
+    }
+  };
+})
+```
 
 A very simple service that just has an orderPizza function that fires a POST to '/order'. Testing it on
 the other hand is a little more difficult. First I'll show you the example, and then I'll explain it.
 
-<script src="https://gist.github.com/jbasinger/877d3608d4dd37fa1b0b.js?file=pizzaServiceTest.js"></script>
+```js
+
+describe('Pizza Service', function(){
+
+  var pizzaService;
+  var $httpBackend;
+  var orderHandler;
+
+  beforeEach(function(){
+
+    module('starter.services');
+    inject(function($injector){
+      pizzaService = $injector.get('Pizza');
+      $httpBackend = $injector.get('$httpBackend');
+      orderHandler = $httpBackend.whenPOST('/order').respond(200,true);
+    });
+
+  });
+
+  it('should let me order pizza', function(){
+    expect(pizzaService.orderPizza).toBeDefined();
+  });
+
+  it('should return when I order pizza', function(){
+    $httpBackend.expectPOST('/order');
+    var pizzaPromise = pizzaService.orderPizza(new Pizza());
+    var orderComplete = false;
+    pizzaPromise.then(function(data){
+      orderComplete = true;
+    });
+    $httpBackend.flush();
+    expect(orderComplete == true);
+  });
+
+  it('should handle errors', function(){
+    $httpBackend.expectPOST('/order');
+    orderHandler.respond(500);
+    var pizzaPromise = pizzaService.orderPizza(new Pizza());
+    var gotError =false;
+    pizzaPromise.catch(function(){
+      gotError = true;
+    });
+    $httpBackend.flush();
+    expect(gotError == true);
+  });
+
+});
+```
 
 First I create a couple variables to hold the services I'll inject using angular. Then you'll notice the `beforeEach` function. This function, as you can probably guess, gets fired before each test is called. We use it to setup our variables.
 

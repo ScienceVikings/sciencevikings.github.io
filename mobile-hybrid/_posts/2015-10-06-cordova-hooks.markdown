@@ -3,6 +3,8 @@ layout: post
 title:  "Cordova Hooks"
 date:   2015-10-06 10:40:00
 author: Justin
+image:
+  path: /assets/img/mobile_hybrid/cordova-hooks/header.jpg
 ---
 
 Cordova is extremely powerful, but it's not always obvious. Hooks are a good example of this.
@@ -42,7 +44,18 @@ settings before our project builds.
 First, create a folder under `www` called `config`. Inside that, create three .js files named `dev.js`, `stage.js` and `prod.js`
 In each of those files, create an AngularJS constant similar to the following:
 
-<script src="https://gist.github.com/jbasinger/b8e095e5648c990e52c1.js?file=constant.js"></script>
+```js
+angular.module('constants',[])
+.constant('ENV',{
+  name: 'dev',
+  baseUrl: 'http://dev.whatever.com',
+  magicKey: '123-456-789',
+  someOtherThing: {
+    id: 1,
+    arrayOfSomeStuff: [1,2,3,4,5]
+  }
+});
+```
 
 We're going to copy one of those files, depending on the passed parameter to the command line, to the file `www/js/config.js`.
 To make sure we can use this constant, add `config.js` to your `index.html` file, and in the `controllers.js` file include the
@@ -64,7 +77,60 @@ You can pass parameters to your Cordova build command line calls by prefixing th
 
 Here is what the `updateConfig.js` file will look like to copy the correct config file.
 
-<script src="https://gist.github.com/jbasinger/b8e095e5648c990e52c1.js?file=updateConfig.js"></script>
+```js
+
+//Here we're going to copy our config based on our options. Dev by default
+
+// GOTCHAS - This assumes there will be only one -- style option in the command line.
+// More code would have to be added to handle more options.
+// Perhaps parse them using this: https://github.com/bcoe/yargs
+
+var fs = require('fs');
+
+module.exports = function(context){
+
+  //Uncomment this to see other options the context gives you.
+  //console.log(context);
+
+  //This gives us promises!
+  var Q = context.requireCordovaModule('q');
+
+  var defer = Q.defer();
+  var envSelect = context.cmdLine.split('--');
+  var envName = 'dev';
+
+  if(envSelect.length > 1){
+    envName = envSelect[1];
+  }
+
+  console.log('Loading environment named: ' + envName);
+
+  var projectRoot = context.opts.projectRoot;
+
+  var sourceFile = projectRoot + '/www/config/' + envName + '.js';
+  var destFile = projectRoot + '/www/js/config.js';
+
+  var readStream =  fs.createReadStream(sourceFile);
+  var writeStream = fs.createWriteStream(destFile);
+
+  readStream.on('error', function(err){
+    defer.reject('Could not copy\n'+sourceFile +'\nto\n' + destFile);
+  });
+
+  writeStream.on('error', function(err){
+    defer.reject('Could not copy\n'+sourceFile +'\nto\n' + destFile);
+  });
+
+  writeStream.on('close', function(){
+    console.log('Environment ' + envName + ' loaded successfully!');
+    defer.resolve();
+  });
+
+  readStream.pipe(writeStream);
+
+  return defer.promise;
+}
+```
 
 As you can see, this is again just a normal node script. We first parse out the parameter we care about, then we grab the file we're looking for and copy it to the destination. We do a bit of error checking on the way.
 
