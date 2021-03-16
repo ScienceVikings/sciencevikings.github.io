@@ -2,8 +2,9 @@
 layout: post
 title:  "Building a Cordova project in Azure DevOps"
 date:   2018-12-30 08:20:00
-categories: mobile_hybrid
 author: Justin
+image:
+  path: /assets/img/mobile_hybrid/cordova-azure-devops/header.jpg
 ---
 
 I've been working on yet another app for a personal project that I plan on releasing for Android and iOS. I found myself in a pickle when it came to actually building the artifacts for the Apple App Store.
@@ -32,23 +33,27 @@ Now, we're going to create a new build pipeline. Select where your source reposi
 
 Next, you're going to want to select `Hosted macOS` as the agent pool.
 
-<img src="/images/cordova-azure-devops/AgentHost.PNG"/>
+<img src="/assets/img/mobile_hybrid/cordova-azure-devops/AgentHost.PNG"/>
+{:.center-image}
 
 We're going to need our key we stored in the library so in the `Agent job 1` band, select the `+` to add a task. Search for `Download Secure File` and add that task, then choose the key from the `Secure File` drop down. You'll also want to give it a reference name in the `Output Variables` section so we can reference it later. The variable we'll use to get the location of the file is `$(key.secureFilePath)`.
 
-<img src="/images/cordova-azure-devops/secure-file-task.PNG"/>
+<img src="/assets/img/mobile_hybrid/cordova-azure-devops/secure-file-task.PNG"/>
+{:.center-image}
 
 Setup that same task again, but for your provisioning profile.
 
 We need to make sure we can store the password for the key securely. Choose the `Variables` tab, and click the add button. The name you give this will be accessed as the variable. For example, if you name it `key.password` you'll use it as `$(key.password)`. Be sure to click the lock icon to secure the variable.
 
-<img src="/images/cordova-azure-devops/secure-password.PNG"/>
+<img src="/assets/img/mobile_hybrid/cordova-azure-devops/secure-password.PNG"/>
+{:.center-image}
 
 This next part may be optional depending on how your project is setup. For a directory to be considered a Cordova project, a piece it needs is a `www` directory. I personally do not commit this directory, because it gets regenerated on builds. Therefore, I had to add a `Command Line` task to generate this directory. You may or may not need this step. If you get an error saying, `This is not a Cordova project directory` then you should try this step.
 
 Now, back in the `Tasks` tab, search for the `Cordova Build` task and add it.
 
-<img src="/images/cordova-azure-devops/add-task.PNG"/>
+<img src="/assets/img/mobile_hybrid/cordova-azure-devops/add-task.PNG"/>
+{:.center-image}
 
 In the Cordova Build task options, set the `Platform` to ios. You can try leaving the cordova version blank to use the latest version. My local version at the time of writing this was 8.0.0 so I tried using that.
 
@@ -56,7 +61,8 @@ When I built after doing this, I had to set my Cordova version back to 7.1.0. I 
 
 Expand the iOS section of the options and fill in the certificate file, password and provisioning profile fields with the secure items we setup earlier. Once you're done, the options should look something like this:
 
-<img src="/images/cordova-azure-devops/build-settings.PNG"/>
+<img src="/assets/img/mobile_hybrid/cordova-azure-devops/build-settings.PNG"/>
+{:.center-image}
 
 Another thing you need when building iOS Apps is the need of a `build.json` file. This is required to set the correct development team and provisioning profile UUID for exporting the app files for consumption. My file lives in the root directory and looks like this:
 
@@ -79,7 +85,8 @@ To find the profile UUID you can open the file in a text editor and look for `<k
 
 My final pipeline looked like this:
 
-<img src="/images/cordova-azure-devops/final-pipeline.PNG"/>
+<img src="/assets/img/mobile_hybrid/cordova-azure-devops/final-pipeline.PNG"/>
+{:.center-image}
 
 Once your config files and tasks are all in place, save and queue up that build!
 

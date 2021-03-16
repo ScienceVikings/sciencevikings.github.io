@@ -21,7 +21,8 @@ echo "New Height: $NEW_HEIGHT"
 echo "Orig Height: $ORIG_HEIGHT"
 echo "Border: $BORDER_HEIGHT"
 # The order of the commands to convert matters.
-convert $IMG_FILE -bordercolor 'rgb(18,25,38)' -border 0x$BORDER_HEIGHT output/$IMG_FILE
+# 'rgb(18,25,38)'
+convert $IMG_FILE -bordercolor white -border 0x$BORDER_HEIGHT output/$IMG_FILE
 # convert $IMG_FILE -border 100 -resize 50%  output/$NAME@0,5x.$EXT
 # convert $IMG_FILE -border 100 -resize 25%  output/$NAME@0,25x.$EXT
 # convert $IMG_FILE -border 100 -resize 12.5% output/$NAME@0,125x.$EXT

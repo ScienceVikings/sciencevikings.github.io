@@ -2,7 +2,6 @@
 layout: post
 title:  "Cordova Getting Started"
 date:   2015-01-04 08:40:00
-categories: mobile_hybrid
 author: Justin
 image:
   path: /assets/img/mobile_hybrid/cordova-getting-started/apache-cordova-logo.png
