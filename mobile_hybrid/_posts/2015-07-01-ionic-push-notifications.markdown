@@ -8,6 +8,9 @@ image:
   path: /assets/img/mobile_hybrid/ionic-notifications/header.jpg
 ---
 
+- Table of Contents
+{:toc .large-only}
+
 ## Ionic Push Notifications
 
 So you have a sweet [Ionic](http://ionicframework.com/) app ready, but want to
