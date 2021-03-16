@@ -3,6 +3,8 @@ layout: post
 title:  "Windows Development on a Mac"
 date:   2020-09-21 12:00:00
 author: Justin
+image:
+  path: /assets/img/development/windows-development-on-a-mac/header.jpg
 ---
 
 # Windows Development on a Mac
@@ -50,7 +52,7 @@ My new favorite IDE has become [Rider](https://www.jetbrains.com/rider/download/
 
 This last bit definitely comes down to personal preference, but I would suggest making your terminal feel like home with some theming and tooling. I use [OhMyZsh](https://ohmyz.sh/) with the [Powerlevel10K](https://github.com/romkatv/powerlevel10k) theme and absolutely love it.
 
-# Bringing it all together
+## Bringing it all together
 
 Now that you have all your software downloaded and installed, you need to do a little setup to bring it all together. First, you want to make sure that your VM Fusion is setup to allow sharing between the Mac and the Windows side of things. Although Rider doesn't work well with networked drives, it's tremendously helpful to have those things shared. Because Rider doesn't like networked drives, I had to install SourceTree on both the Windows and Mac side of things.
 
@@ -60,38 +62,150 @@ That brings me to my next topic, databases. I'm doing Windows development, which
 
 Here are a few examples of how I got it setup with `docker-compose` and some bash scripts to restore database backups, and run scripts. If you have a lot of scripts to run, I'd suggest something like [Roundhouse](https://hub.docker.com/r/namehillsoftware/dotnet-core-roundhouse/tags/) or any other script management tool you can run from docker.
 
-<script src="https://gist.github.com/jbasinger/58b7c4af6adf6d64c620abbf76449149.js?file=docker-compose.yml"></script>
+```yml
+version: "3.8"
+
+services:
+
+  ms-db:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    container_name: ms_db
+    ports:
+      - "1433:1433"
+    environment:
+      - "ACCEPT_EULA=Y"
+      - "SA_PASSWORD=mysecretpassword!"
+    volumes:
+      - ms_db:/var/opt/mssql
+      - ./backup:/backup
+      - ./scripts:/scripts
+    networks:
+      - database
+
+volumes:
+  ms_db:
+    
+networks:
+  database:
+```
 
 Run this file with `docker-compose up` or `docker-compose up -d` to get the server started. You can test connections from the mac by connecting to `mac.host` and it uses the default port for SQL server.
 
-<script src="https://gist.github.com/jbasinger/58b7c4af6adf6d64c620abbf76449149.js?file=restore-all.sh"></script>
+```shell
+#!/bin/bash
+
+CONTAINER="ms_db"
+PASS="mysecretpassword!"
+
+BAKS=$(ls -r backup/*.bak)
+
+for BAK in $BAKS
+do
+    echo "Restoring backup: $BAK"
+
+    # echo "RESTORE FILELISTONLY FROM DISK = '/$BAK'"
+
+    VOLS=$(docker exec -it $CONTAINER /opt/mssql-tools/bin/sqlcmd \
+        -S localhost -U SA -P $PASS \
+        -Q "RESTORE FILELISTONLY FROM DISK = '/$BAK'" \
+         | tr -s ' ' | cut -d ' ' -f 1 | sed 1,2d | tail -r | sed 1,2d | tail -r)
+    
+    i=0
+    SQL="RESTORE DATABASE "
+    for VOL in $VOLS
+    do
+
+        if [[ $i -eq 0 ]]
+        then
+            SQL+="$VOL FROM DISK = '/$BAK' WITH MOVE '$VOL' TO '/var/opt/mssql/data/$VOL.mdf'"
+        else
+            SQL+=", MOVE '$VOL' TO '/var/opt/mssql/data/$VOL.ldf'"
+        fi
+        i+=1
+    done
+
+    # echo $SQL
+    
+    docker exec -it $CONTAINER /opt/mssql-tools/bin/sqlcmd \
+        -S localhost -U SA -P $PASS \
+        -Q "$SQL"
+
+done
+```
 
 Create a folder next to the `docker-compose` file called `backup` and put your SQL Backups `*.bak` files in there and then run the `restore-all.sh` script. It will loop through the backup files in there and restore the databases in your container.
 
 If you look closely on line 14, you'll see a volume `ms_db:/var/opt/mssql`. This sets up a Docker volume on your host machine and shares it with the container so SQL Server can persist the databases between the containers coming up and down.
 
-<script src="https://gist.github.com/jbasinger/58b7c4af6adf6d64c620abbf76449149.js?file=run-script.sh"></script>
+```shell
+#!/bin/bash
+
+if [ -z "$1" ]
+then
+    echo "Please specify a script"
+    exit 1
+fi
+
+CONTAINER="ms_db"
+PASS="mysecretpassword!"
+SCRIPT=$1
+
+docker exec -it $CONTAINER /opt/mssql-tools/bin/sqlcmd \
+        -S localhost -U SA -P $PASS \
+        -i "/$SCRIPT"
+```
 
 Now, make another folder next to the `docker-compose` file called `scripts` and put any scripts you need to run in that folder. The `run-script.sh` file only runs one script at a time, but you can use it in another script to automate running all the scripts in that folder if you'd like. I'll leave that as an exercise for the reader.
 
 One more thing about docker. I tend to have to search through a lot of code in separate projects at once. The best way I've found to do this is to create a shared drive on the Windows VM, using the standard Sharing tools
 
-<img src="/images/windows-development-on-a-mac/winhost-sharing.png"/>
+<img src="/assets/img/development/windows-development-on-a-mac/winhost-sharing.png"/>
+{:.center-image}
 
 Then, on the Mac side of things mount that shared folder and name it whatever you'd like. It will show up in `/Volumes/<your-shared-name>`
 
-<img src="/images/windows-development-on-a-mac/connect-to-server-mac.png"/>
+<img src="/assets/img/development/windows-development-on-a-mac/connect-to-server-mac.png"/>
+{:.center-image}
 
 You can then shared that volume using docker and then that container will have access to the Windows side of code for anything. Here is an example `docker-compose` file that uses the shared volume, once it's mounted.
 
 Here is an example `Dockerfile` and `docker-compose` file that creates an image with a bunch of useful tools and also uses ZSH like my Mac. I use [ripgrep](https://github.com/BurntSushi/ripgrep) for searching and [jq](https://stedolan.github.io/jq/) for querying any JSON output I come across. Both useful tools, and you should feel free to add more things to this container if you need them. Let me know if I'm missing anything you find useful.
 
-<script src="https://gist.github.com/jbasinger/58b7c4af6adf6d64c620abbf76449149.js?file=Dockerfile"></script>
+```dockerfile
+FROM ubuntu:latest
+ENV TERM xterm-256color
+WORKDIR /root
+RUN apt-get update \
+ && apt-get install -y \
+ripgrep \
+jq \
+zsh \
+curl \
+git
+RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+COPY . /root
+WORKDIR /code
+ENTRYPOINT ["/bin/zsh"]
+```
 
-<script src="https://gist.github.com/jbasinger/58b7c4af6adf6d64c620abbf76449149.js?file=docker-compose-tools.yml"></script>
+```yml
+version: "3.8"
+services:
+
+  tools:
+    hostname: tools
+    container_name: tools
+    build:
+      context: ./tools
+    volumes:
+      - "/Volumes/dev:/code"
+    stdin_open: true
+    tty: true
+```
 
 As you can see on line 10 of the `docker-compose-tools.yml` file, I'm sharing the Volume I have mounted from my Windows VM.
 
-# Conclusion
+## Conclusion
 
 That wraps up how I have my equipment set up. I am over the moon about my setup, but could probably tweak it and make tiny Docker tools all day, every day. Being able to develop for anything gives me a tremendous amount of freedom to try anything and everything and I hope seeing how I have things set up will inspire you to set yourself up for success. If you're really excited about how you have things set up, [e-mail](mailto:blog@sciencevikinglabs.com) me and let me know. I'm always excited to hear about cool new tools and ways to be more productive.

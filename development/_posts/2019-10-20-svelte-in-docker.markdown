@@ -3,6 +3,8 @@ layout: post
 title:  "Developing Svelte in Docker"
 date:   2019-10-20 12:39:00
 author: Justin
+image:
+  path: /assets/img/development/svelte-in-docker/header.png
 ---
 
 TLDR: I fixed the Svelte JS template to use Docker and offer live reloading. Check it out [here](https://github.com/ScienceVikings/svelte-template).

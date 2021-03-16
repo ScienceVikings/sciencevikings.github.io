@@ -2,8 +2,9 @@
 layout: post
 title:  "Extracting Windows Icons with NodeJS"
 date:   2015-12-15 15:20:00
-categories: icons nodejs windows
 author: Justin
+image:
+  path: /assets/img/development/icon-extraction/header.jpg
 ---
 
 In an earlier [post](% post_url 2015-11-13-talking-to-processes-with-node %) I spoke about talking to NodeJS processes using good old standard in and standard
@@ -23,7 +24,70 @@ I haven't done any .NET for a long while, so I used this [Microsoft](https://msd
 documentation to learn how to get the data for a specific path. Now all we need to do is convert it to Base64 and print it to standard out, right? Turns output
 a little more house keeping was needed. Here is the code
 
-{% gist a0576a338b4c686a5318 iconextractor.cs %}
+```csharp
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Drawing;
+using System.IO;
+using Newtonsoft.Json;
+
+namespace IconExtractor {
+
+  class IconRequest {
+
+    public string Context { get; set; }
+    public string Path { get; set; }
+    public string Base64ImageData { get; set; }
+
+  }
+
+  class Program {
+    static void Main(string[] args) {
+
+      // https://msdn.microsoft.com/en-us/library/ms404308%28v=vs.110%29.aspx?f=255&MSPPError=-2147217396
+      
+      Console.InputEncoding = UTF8Encoding.UTF8;
+      Console.OutputEncoding = UTF8Encoding.UTF8;
+
+      while (true) {
+
+        string input = Console.In.ReadLine().Trim();
+        IconRequest data = JsonConvert.DeserializeObject<IconRequest>(input);
+
+        try {
+
+          data.Base64ImageData = getIconAsBase64(data.Path);
+          Console.WriteLine(JsonConvert.SerializeObject(data));
+
+        } catch (Exception ex) {
+          Console.Error.WriteLine(ex);
+          Console.Error.WriteLine(input);
+        }
+
+      }
+
+    }
+
+    static string getIconAsBase64(string path) {
+      if (!File.Exists(path)) {
+        return "";
+      }
+
+      Icon iconForPath = SystemIcons.WinLogo;
+      iconForPath = Icon.ExtractAssociatedIcon(path);
+
+      ImageConverter vert = new ImageConverter();
+      byte[] data = (byte[])vert.ConvertTo(iconForPath.ToBitmap(), typeof(byte[]));
+
+      return Convert.ToBase64String(data);
+    }
+  }
+}
+```
 
 Looking through the `using` statements, all I've added was the Newtonsoft.Json package through NuGet.
 This allows me to easily manipulate data to and from JSON, which Node uses natively so it made a lot of sense and made things much easier.
@@ -50,7 +114,75 @@ The `getIconAsBase64` function just uses some built in .Net classes to extract a
 
 Now lets look into how we can use this to our advantage on the NodeJS side of things. NodeJS and .NET do things very differently from one another, and a module like this can be a bit daunting at first so we'll break it down bit by bit. Here is the code
 
-{% gist a0576a338b4c686a5318 iconextractor.js %}
+```js
+var EventEmitter = require('events');
+var fs = require('fs');
+var child_process = require('child_process');
+var _ = require('lodash');
+var os = require('os');
+var path = require('path');
+
+function IconExtractor(){
+
+  var self = this;
+  var iconDataBuffer = "";
+
+  this.emitter = new EventEmitter();
+  this.iconProcess = child_process.spawn(getPlatformIconProcess());
+
+  this.getIcon = function(context, path){
+    var json = JSON.stringify({context: context, path: path}) + "\n";
+    self.iconProcess.stdin.write(json);
+  }
+
+  this.iconProcess.stdout.on('data', function(data){
+
+    var str = (new Buffer(data, 'utf8')).toString('utf8');
+
+    iconDataBuffer += str;
+
+    //Bail if we don't have a complete string to parse yet.
+    if (!_.endsWith(str, '\n')){
+      return;
+    }
+
+    //We might get more than one in the return, so we need to split that too.
+    _.each(iconDataBuffer.split('\n'), function(buf){
+
+      if(!buf || buf.length == 0){
+        return;
+      }
+
+      try{
+        self.emitter.emit('icon', JSON.parse(buf));
+      } catch(ex){
+        self.emitter.emit('error', ex);
+      }
+
+    });
+  });
+
+  this.iconProcess.on('error', function(err){
+    self.emitter.emit('error', err.toString());
+  });
+
+  this.iconProcess.stderr.on('data', function(err){
+    self.emitter.emit('error', err.toString());
+  });
+
+  function getPlatformIconProcess(){
+    if(os.type() == 'Windows_NT'){
+      return path.join(__dirname,'/bin/IconExtractor.exe');
+      //Do stuff here to get the icon that doesn't have the shortcut thing on it
+    } else {
+      throw('This platform (' + os.type() + ') is unsupported =(');
+    }
+  }
+
+}
+
+module.exports = new IconExtractor();
+```
 
 So first we see where I import a bunch of different modules to do things. The only two that are doing the real heavy lifting in our scenario are `EventEmitter` and `child_process`.
 
