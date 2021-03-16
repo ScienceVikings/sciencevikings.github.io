@@ -2,7 +2,6 @@
 layout: post
 title:  "Building a Cordova project in Azure DevOps"
 date:   2018-12-30 08:20:00
-categories: mobile_hybrid
 author: Justin
 ---
 

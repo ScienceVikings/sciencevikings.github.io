@@ -2,7 +2,6 @@
 layout: post
 title:  "Writing Ionic Plugins with Android"
 date:   2015-08-15 19:40:00
-categories: mobile_hybrid
 author: Justin
 image:
   path: /assets/img/mobile_hybrid/android-ionic-plugins/header.png

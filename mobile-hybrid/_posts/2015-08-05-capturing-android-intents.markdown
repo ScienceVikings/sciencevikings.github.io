@@ -2,7 +2,6 @@
 layout: post
 title:  "Capturing Android Intents with Cordova"
 date:   2015-08-05 08:40:00
-categories: mobile_hybrid
 author: Justin
 image:
   path: /assets/img/mobile_hybrid/android-intents/header.jpg

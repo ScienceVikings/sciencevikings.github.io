@@ -2,14 +2,16 @@
 layout: post
 title:  "Creating Popout Buttons for Ionic"
 date:   2015-09-22 10:40:00
-categories: mobile_hybrid
 author: Justin
+image:
+  path: /assets/img/mobile_hybrid/popout-buttons/header.jpg
 ---
 
 I had this idea that it would be really cool to replicate the popout buttons that the Pinterest
 app has for use with Ionic. Below is a sample picture of the Pinterest app and it's buttons. Check out the code on GitHub [here](https://github.com/ScienceVikings/PopoutButtons).
 
-![Sorry about the poop thing.](/images/popout-buttons/pintrest-small.png)
+![Pinterest Popout](/assets/img/mobile_hybrid/popout-buttons/pintrest-small.png)
+{:.center-image}
 
 You tap a grid item, and 3 buttons pop out from your tap location so you can act on that item.
 I thought this would be really cool to replicate using Angular JS and CSS.
@@ -29,7 +31,8 @@ and you'll just get upset because you can't figure out why everything is being s
 
 It turned out very nice though, here is a quick demo of it.
 
-![Sorry about the poop thing.](/images/popout-buttons/popout-demo.gif)
+![Ionic Popout](/assets/img/mobile_hybrid/popout-buttons/popout-demo.gif)
+{:.center-image}
 
 ## Requirements
 I had a few requirements in mind for this.
@@ -56,13 +59,55 @@ The `radStep` property lets you choose the number of radians the next button is 
 
 Here is a sample of the directive, without the link function. That is where the fun stuff comes in and I want to build some anticipation.
 
-<script src="https://gist.github.com/jbasinger/5f2f67086f19fb7d96c4.js?file=svlPopoutButtonsDirectiveSnip.js"></script>
+```js
+angular.module('svl.popout',[])
+.directive('svlPopoutButtons', function(svlPopoutDelegate, $timeout){
+
+  var buttons = [];
+
+  return {
+    restrict: 'E',
+    transclude: true,
+    scope: {
+      centerOffset: '=',
+      radOffset: '=',
+      radStep: '='
+    },
+    controller: function($scope){
+      this.addButton = function(button){
+        buttons.push(button);
+      }
+    },
+    link: function(scope, element, attrs){
+    },
+    template: "<div class='circleButton' ng-transclude></div>"
+  }
+})
+```
 
 Now we need a directive for all the buttons that will come out radially from the center. These will depend on the center button so we use the `require: '^svlPopoutButtons'` option in our directive to make that dependency on the `svlPopoutButton` directive. Notice out the outer is plural and the inner tags are singular.
 
 These also require elements and transclude their contents. Here is the entirety of the button's directive. It doesn't do a lot. The parent does all the work.
 
-<script src="https://gist.github.com/jbasinger/5f2f67086f19fb7d96c4.js?file=svlPopoutButtonsDirective.js"></script>
+```js
+.directive('svlPopoutButton', function(){
+  return {
+    require: '^svlPopoutButtons',
+    restrict: 'E',
+    transclude: true,
+    scope: {},
+    link: function(scope, element, attrs, buttonCtrl){
+
+      element.css('position','absolute');
+
+      var btn = {scope: scope, element: element};
+      buttonCtrl.addButton(btn);
+
+    },
+    template: "<div class='circleButton' ng-transclude></div>"
+  }
+})
+```
 
 If you look closely you can see in the link function that we're passing `buttonCtrl`. This is the controller we declared in the parent directive. This lets us have some communication between them when things are being setup.
 
@@ -70,7 +115,29 @@ I use this to have the buttons add themselves to the parent directive. They are 
 
 You'll also notice that the parent and children directives share a template. Here is the CSS for the `circleButton` class.
 
-<script src="https://gist.github.com/jbasinger/5f2f67086f19fb7d96c4.js?file=style.css"></script>
+```css
+.circleButton{
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  border: 3px solid black;
+  height: 30px;
+  width: 30px;
+  text-align: center;
+  display: inline-table;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-shadow: 3px 3px 2px #888888;
+  cursor: pointer;
+}
+.circleButton i{
+  display: block;
+}
+.hidden{
+  display: none !important;
+}
+```
 
 I setup my CSS to make some round divs. You can change it to do whatever you like. The hidden class is used to manually hide some buttons when we're moving things into position.
 
@@ -88,11 +155,38 @@ And now, since services are singletons in AngularJS and Javascript gives you the
 
 All we want to do is hide and show the buttons, so here is the service that declares those fake functions initially.
 
-<script src="https://gist.github.com/jbasinger/5f2f67086f19fb7d96c4.js?file=delegate.js"></script>
+```js
+.factory('svlPopoutDelegate', function(){
+  var del = {};
+  var fakeFunctions = ['show','hide'];
+  angular.forEach(fakeFunctions, function(fn){
+    del[fn] = function(){return true;}
+  });
+  return del;
+});
+```
 
 Now, if we want to hide or show our directive, we just inject the delegate service and call those functions. Here is the controller to show how it works.
 
-<script src="https://gist.github.com/jbasinger/5f2f67086f19fb7d96c4.js?file=controller.js"></script>
+```js
+angular.module('starter.controllers', ['svl.popout'])
+.controller('MainCtrl', function($scope, $ionicPopover,svlPopoutDelegate) {
+
+  $scope.toggled = false;
+  $scope.radOffset = -Math.PI/4;
+  $scope.radStep = Math.PI/8;
+
+  $scope.showPopout = function($event){
+    if ($scope.toggled){
+        svlPopoutDelegate.hide();
+    } else {
+      svlPopoutDelegate.show($event);
+    }
+
+    $scope.toggled = !$scope.toggled;
+  }
+});
+```
 
 ## Sliding Icons out
 
@@ -106,7 +200,15 @@ I'm going to go over the hide and show functions and omit the rest of the link f
 
 Lets go over the easy function first, the hide function. Here we just add our hidden class and throw our buttons way off into the distance so they can't be seen.
 
-<script src="https://gist.github.com/jbasinger/5f2f67086f19fb7d96c4.js?file=hide.js"></script>
+```js
+svlPopoutDelegate.hide = function(){
+  element.addClass('hidden');
+  translate(element, -1000,-1000);
+  angular.forEach(buttons, function(btn){
+    translate(btn.element, -1000, -1000);
+  });
+}
+```
 
 ## The Show Function
 
@@ -124,13 +226,88 @@ To get them to animate from the center circle, we use the `$timeout` to fire at 
 
 Here is the show function in its entirety.
 
-<script src="https://gist.github.com/jbasinger/5f2f67086f19fb7d96c4.js?file=show.js"></script>
+```js
+svlPopoutDelegate.show = function($event){
+
+  element.removeClass('hidden');
+
+  var offsetObjects = document.getElementsByClassName('has-header');
+  var totalOffsetHeight = 0;
+  var totalOffsetWidth = element[0].scrollWidth/2;
+
+  angular.forEach(offsetObjects, function(el){
+    totalOffsetHeight += el.offsetTop + element[0].scrollHeight/2;
+  });
+
+  var coords = ionic.tap.pointerCoord($event);
+  coords.y -= totalOffsetHeight;
+  coords.x -= totalOffsetWidth;
+
+  translate(element, coords.x,coords.y);
+
+  //Make the buttonOffsetDistance and
+  var buttonOffsetDistance = scope.centerOffset || 50;
+  var radOffset = scope.radOffset || 0;
+
+  angular.forEach(buttons, function(btn){
+
+    translate(btn.element,0,0,0);
+
+    var btnHeight = btn.element[0].scrollHeight/2;
+    var btnWidth = btn.element[0].scrollWidth/2;
+
+    $timeout(function(){
+
+      var x = Math.round(Math.sin(radOffset)*(buttonOffsetDistance)-btnWidth);
+      var y = Math.round(Math.cos(radOffset)*(-buttonOffsetDistance));
+
+      translate(btn.element, x, y, 0.25);
+      radOffset += scope.radStep || Math.PI/4;
+
+    },0);
+
+  });
+
+}
+```
 
 # The View
 
 You're probably wondering what the view looks like in all this. Turns out it's pretty simple. Here is the entire thing with a couple test ng-click bindings to show that you can actually tap the popouts.
 
-<script src="https://gist.github.com/jbasinger/5f2f67086f19fb7d96c4.js?file=view.html"></script>
+```html
+<ion-view view-title="main">
+  <ion-content  ng-click="showPopout($event)">
+    <h1>Tap Anywhere</h1>
+    <svl-popout-buttons>
+      <svl-popout-button ng-click="test1()">
+        <i class="icon ion-heart"></i>
+      </svl-popout-button>
+      <svl-popout-button ng-click="test2()">
+        <i class="icon ion-wrench"></i>
+      </svl-popout-button>
+      <svl-popout-button>
+        <i class="icon ion-erlenmeyer-flask"></i>
+      </svl-popout-button>
+      <svl-popout-button ng-click="test3()">
+        <i class="icon ion-pizza"></i>
+      </svl-popout-button>
+      <svl-popout-button>
+        <i class="icon ion-beer"></i>
+      </svl-popout-button>
+      <svl-popout-button>
+        <i class="icon ion-leaf"></i>
+      </svl-popout-button>
+      <svl-popout-button>
+        <i class="icon ion-nuclear"></i>
+      </svl-popout-button>
+      <svl-popout-button>
+        <i class="ion-flame"></i>
+      </svl-popout-button>
+    </svl-popout-buttons>
+  </ion-content>
+</ion-view>
+```
 
 # Conclusion
 

@@ -2,7 +2,6 @@
 layout: post
 title:  "Cordova Hooks"
 date:   2015-10-06 10:40:00
-categories: mobile_hybrid
 author: Justin
 ---
 

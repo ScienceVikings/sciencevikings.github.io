@@ -2,7 +2,6 @@
 layout: post
 title:  "Getting an Apple certificate from Windows"
 date:   2018-12-29 07:20:00
-categories: mobile_hybrid
 author: Justin
 ---
 

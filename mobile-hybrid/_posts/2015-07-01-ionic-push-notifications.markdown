@@ -2,7 +2,6 @@
 layout: post
 title:  "Ionic Push Notifications"
 date:   2015-07-01 15:30:00
-categories: mobile_hybrid
 author: Justin
 image:
   path: /assets/img/mobile_hybrid/ionic-notifications/header.jpg

@@ -6,7 +6,7 @@ layout: grid
 title: Mobile Hybrid Dev
 
 # The name of the tag, used in a post's front matter (e.g. tags: [<slug>]).
-slug: mobile_hybrid
+slug: mobile-hybrid
 
 # (Optional) Write a short (~150 characters) description of this featured tag.
 description: >

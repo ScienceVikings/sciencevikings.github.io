@@ -2,7 +2,6 @@
 layout: post
 title:  "Ionic Getting Started"
 date:   2015-07-16 08:40:00
-categories: mobile_hybrid
 author: Justin
 image:
   path: /assets/img/mobile_hybrid/ionic-intro/header.jpeg
