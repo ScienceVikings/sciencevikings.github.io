@@ -3,6 +3,8 @@ layout: post
 title:  "Simple Cloud Formation"
 date:   2020-10-19 00:00:00
 author: Justin
+image:
+  path: /assets/img/development/simple-cloud-formation/header.jpg
 ---
 
 # Simple Cloud Formation
@@ -25,7 +27,21 @@ To set up an S3 static site, you're going to need a couple things in AWS. We're 
 
 First, lets check out the way a Cloud Formation (CF) template is set up. There are a few relevant top level sections to use for this purposes of this post. First, lets take a look at the `Parameters` section:
 
-<script src="https://gist.github.com/jbasinger/2dad92921d7eca4215d9054592bbfb7e.js?file=params.yml"></script>
+```yml
+Parameters:
+  ProjectName:
+    Type: String
+    Default: SimpleCloudFormation
+    Description: The name of the project we want to make.
+  BucketName:
+    Type: String
+    Default: simple-cloud-formation
+    Description: The name of the bucket your site will be held in.
+  ProjectSourceLocation:
+    Type: String
+    Default: "https://github.com/ScienceVikings/SimpleCloudFormation.git"
+    Description: Location of the code for CodeBuild to utilize.
+```
 
 Here we are setting up parameters that we can use in the resources section of the rest of our files. The `ProjectName` is the name of our project we'll use for the Stack and other resource names where capital letters are allowed. For your purposes, feel free to change any `Default` values to whatever you'd like to call them.
 
@@ -33,7 +49,30 @@ Here we are setting up parameters that we can use in the resources section of th
 
 Now, lets look at the resources. Lets see how we can set things up to make an S3 bucket using CF.
 
-<script src="https://gist.github.com/jbasinger/2dad92921d7eca4215d9054592bbfb7e.js?file=s3.yml"></script>
+```yml
+Resources:
+
+  S3Bucket:
+    DeletionPolicy: 'Delete'
+    Properties:
+      AccessControl: 'Private'
+      BucketName: !Ref BucketName
+    Type: 'AWS::S3::Bucket'
+
+  S3BucketPolicy:
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Statement:
+          - Action:
+              - 's3:GetObject'
+            Effect: 'Allow'
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+            Resource:
+              - !Sub 'arn:aws:s3:::${S3Bucket}/*'
+    Type: 'AWS::S3::BucketPolicy'
+```
 
 The resources section will only show up once in this file and the resources themselves will be children of that section. As we can see, we're creating two resources. One is the actual S3 bucket to hold our site and the other is a security policy that will give CloudFront, a service we'll talk about next, access to get the objects in that bucket.
 
@@ -47,7 +86,61 @@ Now lets look quickly at how the resources are set up. You'll see that each one 
 
 Lets take a look at the Cloud Front portion of the template next. Cloud Front is how your site gets distributed and served out from S3. We're going to point it to our S3 bucket, tell it the root object name and set up permissions so that only Cloud Front can have access to the S3 bucket and it's contents are not made public directly.
 
-<script src="https://gist.github.com/jbasinger/2dad92921d7eca4215d9054592bbfb7e.js?file=cloudfront.yml"></script>
+```yml
+
+  CloudFront:
+    Properties:
+      DistributionConfig:
+        # Aliases: [ "mysite.example.com" ]
+        # ViewerCertificate:
+        #   AcmCertificateArn: !Ref ACMCert
+        #   SslSupportMethod: sni-only
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - 'HEAD'
+            - 'GET'
+          CachedMethods:
+            - 'HEAD'
+            - 'GET'
+          Compress: false
+          DefaultTTL: 86400
+          ForwardedValues:
+            Cookies:
+              Forward: 'none'
+            Headers:
+              - 'Origin'
+            QueryString: false
+          MaxTTL: 31536000
+          MinTTL: 86400
+          TargetOriginId: !Sub 's3-origin-${S3Bucket}'
+          ViewerProtocolPolicy: 'redirect-to-https'
+        DefaultRootObject: 'index.html'
+        Enabled: true
+        HttpVersion: 'http1.1'
+        IPV6Enabled: false
+        Origins:
+          - DomainName: !GetAtt S3Bucket.DomainName
+            Id: !Sub 's3-origin-${S3Bucket}'
+            OriginPath: ''
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
+        PriceClass: 'PriceClass_All'
+    Type: 'AWS::CloudFront::Distribution'
+
+  CloudFrontOriginAccessIdentity:
+    Metadata:
+      Comment: 'Access S3 bucket content only through CloudFront'
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: 'Access S3 bucket content only through CloudFront'
+    Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
+  
+  # ACMCert:
+  #   Type: "AWS::CertificateManager::Certificate"
+  #   Properties:
+  #     DomainName: "mysite.example.com"
+  #     ValidationMethod: DNS
+```
 
 `DistributionConfig` is the big section here, containing many sub-sections. You'll notice the part that is commented out. This is only used if you're setting up your site to use a domain or subdomain that you own. While out of scope for this post, I wanted to put it in there in case anyone needed it. It references an `ACMCert` resource that is also included, but commented out below the Cloud Front resource.
 
@@ -59,7 +152,46 @@ The `OriginAccessIdentity` lets Cloud Front serve the data from that bucket as a
 
 The last bit of the resource section I'd like to talk about are the components needed to set up CodeBuild. CodeBuild is part of the CI/CD services AWS has to offer and will allow us to build and deploy our application right once we commit it. Be warned, this section is __big__. But, it's big because there are a lot of descriptive policy statements that you need set up just right for CodeBuild to have access to S3. Here are the CodeBuild resources.
 
-<script src="https://gist.github.com/jbasinger/2dad92921d7eca4215d9054592bbfb7e.js?file=codebuild.yml"></script>
+```yml
+CodeBuild:
+    Type: AWS::CodeBuild::Project
+    DependsOn: [S3Bucket, CodeBuildRole]
+    Properties:
+      Name: !Ref ProjectName
+      EncryptionKey: !Join ["",["arn:aws:kms:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":alias/aws/s3"]]
+      ServiceRole: !GetAtt [CodeBuildRole, Arn]
+      Source:
+        Type: GITHUB
+        Location: !Ref ProjectSourceLocation
+        GitCloneDepth: 1
+        # Auth:
+        #   Resource: !Ref CodeBuildSourceCredential
+        #   Type: OAUTH
+      Artifacts:
+        Type: S3
+        Location: !Ref S3Bucket
+        Name: build
+        Packaging: NONE
+      Environment:
+        Type: LINUX_CONTAINER
+        Image: "aws/codebuild/standard:4.0"
+        ComputeType: "BUILD_GENERAL1_SMALL"
+        ImagePullCredentialsType: CODEBUILD
+        PrivilegedMode: true
+      Triggers:
+        Webhook: true
+        FilterGroups:
+          -  - Type: EVENT
+               Pattern: "PUSH, PULL_REQUEST_MERGED"
+               ExcludeMatchedPattern: false
+    
+  # CodeBuildSourceCredential:
+  #   Type: AWS::CodeBuild::SourceCredential
+  #   Properties:
+  #     AuthType: PERSONAL_ACCESS_TOKEN
+  #     ServerType: GITHUB
+  #     Token: "{% raw %}{{resolve:secretsmanager:MySecret/Token:SecretString:MyAccessToken}}{% endraw %}"
+```
 
 First, we have an actual CodeBuild project. Pretty straight forward, but one thing new to this is the `DependsOn` field. This field lets you tell CF that the listed resources need to be built before this one can be. This lets you control the creation flow of your stack to make sure you have the resources you need before trying to build something that won't work without them.
 
@@ -79,13 +211,59 @@ Finally, the `Triggers` section tells CodeBuild to set up a webhook with your so
 
 When CodeBuild builds, it looks for a `buildspec.yml` file as a build template. This is basically a set of sections that contain shell commands to run in your environment. For this, we're just syncing things up with S3.
 
-<script src="https://gist.github.com/jbasinger/2dad92921d7eca4215d9054592bbfb7e.js?file=buildspec.yml"></script>
+```yml
+version: 0.2
+        
+phases:
+  build:
+    commands:
+      - set -e
+      - mkdir ./build
+      - cp ./public/** ./build
+      - aws s3 sync ./build s3://simple-cloud-formation
+```
 
 The steps go like this: Set up some error handling with the `set -e` then make a build directory, copy the site to the build directory and then sync it with our project bucket.
 
 The final resource we need is our CodeBuild policy.
 
-<script src="https://gist.github.com/jbasinger/2dad92921d7eca4215d9054592bbfb7e.js?file=codebuildpolicy.yml"></script>
+```yml
+CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join ["",['CodeBuild-', !Ref ProjectName]]
+      Path: /service-role/
+      Policies:
+        - PolicyName: !Join ["",['CodeBuildBasePolicy-', !Ref ProjectName]]
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Resource:
+                  - !Join ["",["arn:aws:logs:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":log-group:/aws/codebuild/", !Ref ProjectName]]
+                  - !Join ["",["arn:aws:logs:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":log-group:/aws/codebuild/", !Ref ProjectName, ":*"]]
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+              - Effect: Allow
+                Resource:
+                  - !Join ["",["arn:aws:s3:::", !Ref BucketName]]
+                  - !Join ["",["arn:aws:s3:::", !Ref BucketName, "/*"]]
+                Action:
+                  - "s3:PutObject"
+                  - "s3:GetBucketAcl"
+                  - "s3:GetBucketLocation"
+                  - "s3:ListBucket"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - codebuild.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+```
 
 This section can be intimidating, but if we break it down into parts we can understand what is going on. First, we have the `RoleName` which is, simply, the name of our new role we'll be giving CodeBuild. The `Path` is where it'll live in IAM. The meat of this is in the `Policies` section.
 
@@ -95,7 +273,13 @@ The next one is for our S3 bucket. This is allowing our `sync` command from the 
 
 The final section of the template file is the `Outputs` section.
 
-<script src="https://gist.github.com/jbasinger/2dad92921d7eca4215d9054592bbfb7e.js?file=outputs.yml"></script>
+```yml
+Outputs:
+  CloudFrontDomainName:
+    Value: !GetAtt CloudFront.DomainName
+  CloudFrontId:
+    Value: !Ref CloudFront
+```
 
 This section just tells CF what information you want it to show you in the Output tab for easy access to things like the domain name assigned to your new CloudFront instance.
 
@@ -103,41 +287,50 @@ This section just tells CF what information you want it to show you in the Outpu
 
 Finally, we need to just put it all together. AWS can be a bit confusing, we use the search functions to find the Cloud Formation service.
 
-<img src="/images/simple-cloud-formation/find-cloud-formation.png"/>
+<img src="/assets/img/development/simple-cloud-formation/find-cloud-formation.png"/>
+{:.center-image}
 
 Next, you'll be presented with the list of stacks you already have, with a `Create Stack` button on the right. Go ahead and click that.
 
-<img src="/images/simple-cloud-formation/stacks.png"/>
+<img src="/assets/img/development/simple-cloud-formation/stacks.png"/>
+{:.center-image}
 
 You'll be presented with the initial screen of the stack creation wizard. We just built our template, so  we'll choose the `Template is ready` option in the Prerequisite section and the `Upload a template file` in the Specify template section. Click the `Choose file` button and choose the `template.yml` file we created above.
 
-<img src="/images/simple-cloud-formation/create-stack.png"/>
+<img src="/assets/img/development/simple-cloud-formation/create-stack.png"/>
+{:.center-image}
 
 One of the most confusing and frustrating parts of Cloud Formation, outside of creating the template itself, can be when you get an [error](https://wompwompwomp.com/) in your template.
 
-<img src="/images/simple-cloud-formation/bad-template.png"/>
+<img src="/assets/img/development/simple-cloud-formation/bad-template.png"/>
+{:.center-image}
 
 Now, it tells you the line and column number of the error, but as we all know that can rarely be trusted. What I found useful when getting the dreaded `Template format error` was to actually click the `View in Designer` button. It actually explains what is wrong with your template more in depth in the `Messages` section on the bottom right.
 
-<img src="/images/simple-cloud-formation/bad-template-message.png"/>
+<img src="/assets/img/development/simple-cloud-formation/bad-template-message.png"/>
+{:.center-image}
 
 This is extremely useful information that I wish AWS would just show somewhere on the first screen, but alas, they do not.
 
-<img src="/images/simple-cloud-formation/create-stack.png"/>
+<img src="/assets/img/development/simple-cloud-formation/create-stack.png"/>
+{:.center-image}
 
 Once you have a passable template, you'll get to a screen that will show the parameters it pulled from the template file and ask you to name your stack. After you come up with a name, just click `Next`.
 
-<img src="/images/simple-cloud-formation/stack-details.png"/>
+<img src="/assets/img/development/simple-cloud-formation/stack-details.png"/>
+{:.center-image}
 
 Here we have other options. If you need anything fancy, you can set it up here but I would recommend checking out how to do it in the template file itself so you can keep record of it in code. I usually just scroll to the bottom and click `Next`.
 
-<img src="/images/simple-cloud-formation/review-stack.png"/>
+<img src="/assets/img/development/simple-cloud-formation/review-stack.png"/>
+{:.center-image}
 
 Finally, you get a chance to review the stack you're going to create. You'll need to scroll down to the bottom and check off the `I think I know what I'm doing` checkbox before you can start the actual stack creation.
 
 Now, we should see our stack build in progress!
 
-<img src="/images/simple-cloud-formation/create-stack-in-progress.png"/>
+<img src="/assets/img/development/simple-cloud-formation/create-stack-in-progress.png"/>
+{:.center-image}
 
 There can be errors here as well, but if there are, CF will do its best to roll things back to the state it started in. It's pretty good at explaining what went wrong and why, which will show up in that `Events` section.
 
@@ -145,11 +338,13 @@ There can be errors here as well, but if there are, CF will do its best to roll 
 
 Lets find out! Commit your code to the repository you specified in your template file, and search up CodeBuild in the services search in AWS.
 
-<img src="/images/simple-cloud-formation/find-code-build.png"/>
+<img src="/assets/img/development/simple-cloud-formation/find-code-build.png"/>
+{:.center-image}
 
 Here, we should see a list of projects and you can click the one that Cloud Formation made for you.
 
-<img src="/images/simple-cloud-formation/code-build-progress.png"/>
+<img src="/assets/img/development/simple-cloud-formation/code-build-progress.png"/>
+{:.center-image}
 
 Clicking the link of your projects build in progress will give you a button to `Tail logs` and you can see what CodeBuild is doing, as it does it. Once your build succeeds, check out the URL that your stack put in the output section and you should see your new site!
 

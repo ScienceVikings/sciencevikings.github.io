@@ -3,6 +3,8 @@ layout: post
 title:  "Blazor Code Snippet Component with Highlight JS"
 date:   2021-01-02 00:00:00
 author: Justin
+image:
+  path: /assets/img/development/blazor-code-snippet/header.png
 ---
 
 ## Make a Code Snippet component in Blazor using Highlight JS
@@ -17,7 +19,28 @@ First thing we're going to need to do is setup the Javascript. [Highlight.js](ht
 to be using C#. Because of how Blazor renders, we're also going to need a function we call in the OnAfterRenderAsync overload of our component. Here is the code with some context
 to see where I added the scripts.
 
-<script src="https://gist.github.com/jbasinger/991ea0d63661430fe94cd293055001f9.js?file=index.html"></script>
+```html
+<body>
+    <app>Loading...</app>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/highlight.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/languages/csharp.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/languages/css.min.js"></script>
+    <script>
+        window.highlightSnippet = function(){
+            document.querySelectorAll('pre code').forEach((el)=>{
+                hljs.highlightBlock(el);
+            });
+        }
+    </script>
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+```
 
 As you can see, I added the [highlight.js](https://highlightjs.org/) script, the C# language file and the CSS needed to put it all together. All the function I created does is
 tell [highlight.js](https://highlightjs.org/) to find all the html tags I want to highlight and do it's magic with them.
@@ -26,7 +49,23 @@ tell [highlight.js](https://highlightjs.org/) to find all the html tags I want t
 
 Now for the easy part, the Blazor component. Here is the code.
 
-<script src="https://gist.github.com/jbasinger/991ea0d63661430fe94cd293055001f9.js?file=CodeSnippet.razor"></script>
+```csharp
+<pre class="code"><code class="@Language">
+@ChildContent
+</code></pre>
+
+@code {
+    [Inject] private IJSRuntime _js { get; set; }
+        
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public string Language { get; set; } = "csharp";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await _js.InvokeVoidAsync("highlightSnippet");
+    }
+}
+```
 
 After looking at the markup, you can see that things are quite simple. We're using `@Language` as a parameter and defaulting that to `csharp` since that is what I mostly use the component for myself.
 The `@childContent` RenderFragment is where the code we put in our snippet component will be placed. The `OnAfterRenderAsync` overload is invoking our javascript function telling [highlight.js](https://highlightjs.org/)
@@ -34,9 +73,24 @@ to find our code and highlight it. It is as easy as that!
 
 You can also add a splash of your own CSS to make things a little prettier. Here is an example of how you could use the component, and the result from the page.
 
-<script src="https://gist.github.com/jbasinger/991ea0d63661430fe94cd293055001f9.js?file=usage.razor"></script>
+```csharp
+<CodeSnippet>
+public class PersonModel
+{
+    public int Id { get; set; }
+    [Display(Name="First Name")]
+    public string Name { get; set; }
+    public string City { get; set; }
+    public string State { get; set; }
+    [BlazinHeaderFormat("{0:C}")]
+    public int Salary { get; set; }
+    [BlazinHeaderIgnore]
+    public string ThisColumnWontEvenShowUp { get; set; }
+}
+</CodeSnippet>
+```
 
-<img src="/images/blazor-code-snippet/result.png"/>
+<img src="/assets/img/development/blazor-code-snippet/result.png"/>
 
 ### Conclusion
 
