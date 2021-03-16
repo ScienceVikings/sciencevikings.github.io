@@ -1,10 +1,10 @@
 ---
 layout: post
 title:  "Hack The Box - Academy Writeup"
+date:   2021-02-27 06:00:00
 image: 
   path: /assets/img/htb/HTB-Academy/Header.png
-date:   2021-02-27 06:00:00
-author: Justin
+author: Ryan
 ---
 
 - Table of Contents
