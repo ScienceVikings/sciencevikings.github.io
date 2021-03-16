@@ -4,7 +4,14 @@ title:  "Ionic Push Notifications"
 date:   2015-07-01 15:30:00
 categories: mobile_hybrid
 author: Justin
+image:
+  path: /assets/img/mobile_hybrid/ionic-notifications/header.jpg
 ---
+
+- Table of Contents
+{:toc .large-only}
+
+## Ionic Push Notifications
 
 So you have a sweet [Ionic](http://ionicframework.com/) app ready, but want to
 be able to push notifications to your users. The guys over at Drifty feel you
@@ -94,7 +101,27 @@ You can get your private key from the [dashboard](https://apps.ionic.io/apps) as
 well, by selecting the settings of your app and viewing the Secret Key.
 
 The POST body will need to be in JSON format like the following:
-<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43.js?file=JSONFormat.js"></script>
+```json
+{
+  "tokens":[
+    "b284a6f7545368d2d3f753263e3e2f2b7795be5263ed7c95017f628730edeaad",
+    "d609f7cba82fdd0a568d5ada649cddc5ebb65f08e7fc72599d8d47390bfc0f20"
+  ],
+  "notification":{
+    "alert":"Hello World!",
+    "android":{
+      "collapseKey":"foo",
+      "delayWhileIdle":true,
+      "timeToLive":300,
+      "payload":{
+        "$state": "a_ui-router_state",
+        "key1":"value",
+        "key2":"value"
+      }
+    }
+  }
+}
+```
 
 The tokens are the device tokens you want to send the notification to. The
 `alert` key is what will show up on the notification screen, and the payload
@@ -107,8 +134,42 @@ using ui-router in your Ionic application. If it is not present, things **will**
  blow up. The application will load this state when the notification is opened.
 
 Here is a sample snippet of Ruby code for pushing a notification:
+```ruby
+device_token = 'example_token'
+ionic_private_key = 'your_ionic_private_key_here'
+ionic_app_id = 'your_ionic_app_id_here'
 
-<script src="https://gist.github.com/jbasinger/acca6dae4cb68a4108fb.js"></script>
+form_data = {
+    'tokens' => [device_token],
+    'notification' => {
+      'alert' => "Hello Push World!",
+      'android' => {
+        'payload' => {
+          'url' => url,
+          '$state' => 'home'
+        }
+      }
+    }
+  }
+
+  puts form_data.inspect
+
+  uri = URI.parse('https://push.ionic.io/api/v1/push')
+  req = Net::HTTP::Post.new(uri.path)
+  req.basic_auth ionic_private_key, ''
+  req['Content-Type'] = 'application/json'
+  req['X-Ionic-Application-Id'] = ionic_app_id
+  req.body = form_data.to_json
+
+  puts req.inspect
+
+  resp = Net::HTTP.new(uri.host, uri.port)
+  resp.use_ssl = true
+  resp.start {|http|
+    res = http.request(req)
+    puts res.body
+  }
+```
 
 ## Step 3: Your App
 The final step is to setup your application to receive the notifications. There
@@ -122,7 +183,12 @@ First you need to install a few extra components in your Ionic app using their
 `ionic add` and `ionic plugin` command line functions. From your app's directory
 in a terminal run the following commands:
 
-<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43.js?file=AppSetupCommands.sh"></script>
+```console
+ionic plugin add https://github.com/phonegap-build/PushPlugin.git
+ionic add ngCordova
+ionic add ionic-service-core
+ionic add ionic-service-push
+```
 
 This will install the phonegap push notification plugin, Ionic's angular to
 cordova plugin framework, and Ionic's core and push services used to make
@@ -130,17 +196,31 @@ the rest of this a breeze.
 
 Then, open up your `index.html` page and add the following libraries to your
 `<head>` tag:
-<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43.js?file=ScriptTags.html"></script>
+
+```html
+<!-- ionic/angularjs js -->
+<script src="lib/ionic/js/ionic.bundle.js"></script>
+<script src="lib/ngCordova/dist/ng-cordova.js"></script>
+<script src="lib/ionic-service-core/ionic-core.js"></script>
+<script src="lib/ionic-service-push/ionic-push.js"></script>
+```
 
 Finally, you need to add those services to where you declare your angularjs
 module. It should look something like this:
 
-<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43.js?file=ModuleAdditions.js"></script>
+```js
+angular.module('yourTotallyAwesomeApp', [
+  'ionic',
+  'ngCordova',
+  'ionic.service.core',
+  'ionic.service.push'
+]);
+```
 
 Please note that all these examples above were borrowed from
 [Ionic's documentation](http://docs.ionic.io/v1.0/docs/push-from-scratch).
 
-####Quick Review
+#### Quick Review
 - `ionic plugin add https://github.com/phonegap-build/PushPlugin.git`
 - `ionic add ngCordova`
 - `ionic add ionic-service-core`
@@ -155,13 +235,13 @@ Please note that all these examples above were borrowed from
   - ionic.service.core
   - ionic.service.push
 
-###Handling Push Notifications
+### Handling Push Notifications
 There are three things your app needs to handle in regards to notifications.
 It needs to identify itself with Ionic's server, handle a callback from Ionic to
 get the device token for that device and handle a callback from Ionic to do
 something when a notification is received.
 
-####Identify Your App with Ionic
+#### Identify Your App with Ionic
 In a `config` block of your Ionic application, you need to identify your app
 with the Ionic servers. You need three things for this. Your Ionic App ID,
 your Ionic Public key and your Google GCM ID.
@@ -173,9 +253,21 @@ and selecting your project and then clicking the Overview link will give you
 your GCM ID. It's the Project Number across the top.
 
 Your `config` block should look something like this:
-<script src="https://gist.github.com/jbasinger/483304bd342fa07f6b43.js?file=ConfigBlock.js"></script>
 
-####Reacting to Notifications
+```js
+angular.module('yourTotallyAwesomeApp')
+.config(['$ionicAppProvider', function($ionicAppProvider) {
+
+  $ionicAppProvider.identify({
+    app_id: 'ionic_app_ID',
+    api_key: 'ionic_public_key',
+    gcm_id: 'google_project_number'
+  });
+
+}]);
+```
+
+#### Reacting to Notifications
 In a `run` block of your app, you can register with the push service to react
 to notifications being selected by users when the app is in various states.
 
@@ -199,16 +291,75 @@ with Ionic and you're ready to go!
 
 Here is a snippet of what a push registration would look like:
 
-<script src="https://gist.github.com/jbasinger/8533c6fe4417990af665.js"></script>
+```js
+angular.module('yourTotallyAwesomeApp')
+.run(function($ionicPlatform, $ionicPush, $ionicUser) {
 
-####Quick Review
+  $ionicPlatform.ready(function() {
+    //A cheat check to make sure we're on a device
+    if(window.plugins){
+
+      $ionicPush.register({
+        canRunActionsOnWake: true,
+        onNotification: function(notification) {
+
+          if (notification.event){
+
+            if(notification.event == "registered"){
+              //Here you'll want to do something with notification.regid
+              //It's the deviceToken your server will use to tell Ionic
+              //whose device this is.
+              console.log(notification.regid);
+            }
+
+            if(notification.event == "message"){
+
+              //Yes you need to access payload.payload.
+              //I tried changing it to something else server side
+              //and it didn't work. Sorry =(
+              console.log(notification.payload.payload);
+
+              if(notification.foreground){
+                //This state happens when the notification comes in and the user
+                //is in the application.
+                console.log('Foreground Notification Received!');
+              } else {
+                if(notification.coldstart){
+                  //This state happens when the notification is selected by the
+                  //user but the app is not currently running.
+                  console.log('User tapped notification while app was closed!');
+                } else {
+                  //This state happens when the notification is selected by the
+                  //user but the app has been backgrounded.
+                  console.log('User tapped notification while app was backgrounded!');
+                }
+              }
+            }
+          }
+        }
+      }).then(function(deviceToken) {
+
+        var user = $ionicUser.get();
+        if(!user.user_id) {
+          user.user_id = device.uuid;
+        };
+
+        $ionicUser.identify(user);
+
+      });
+    }
+  });
+});
+```
+
+#### Quick Review
 - Identify keys and IDs with `$ionicAppProvider.identify` in `config` block
 - Register for push notifications with `$ionicPush.register` in `run` block
 - Identify user with `$ionicUser` in `then` of `$ionicPush.register` promise.
 - Handle notification states in `onNotification` callback of `$ionicPush.register`
 function
 
-##Conclusion
+## Conclusion
 There are quite a few pieces to this puzzle, but once you get the idea of how the
 data is flowing, it's a bit easier to understand what each of these pieces are doing
 and why they are needed. Now, go notify your users!

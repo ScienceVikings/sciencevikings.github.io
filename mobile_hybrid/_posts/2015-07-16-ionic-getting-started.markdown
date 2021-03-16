@@ -4,9 +4,14 @@ title:  "Ionic Getting Started"
 date:   2015-07-16 08:40:00
 categories: mobile_hybrid
 author: Justin
+image:
+  path: /assets/img/mobile_hybrid/ionic-intro/header.jpeg
 ---
 
-# The Install
+- Table of Contents
+{:toc .large-only}
+
+## The Install
 Getting everything properly installed for Cordova to run on Android can be a
 pain. You need NodeJS, the Java JDK, ANT and then the Android SDK. If you haven't
 done any of that, you can follow this [previous post](http://sciencevikinglabs.com/science/cordova/phonegap/code/2015/01/04/cordova-getting-started.html) about setting up Cordova to get what you need for an Ionic
@@ -15,7 +20,7 @@ application. We're leaving the iOS setup as an exercise for the reader for now.
 Once all that is installed, open up your favorite terminal and install the Ionic
 package with `npm install -g ionic` This will install ionic globally on your machine. You unix wizards will probably need to prefix a `sudo` on there, but you knew that.
 
-# Creating a Project
+## Creating a Project
 The easy way to just start a simple tab based throw away app is to go to the
 directory you want it in with a command prompt and run `ionic start myApp` where
 `myApp` is the name of the directory you want the project to be stored in. But,
@@ -62,7 +67,8 @@ Ionic template shows up with some crazy playlist thing. You'll notice that if yo
 JS files and saving them that the ionic server will reload automatically. Click around a bit and get a
 feel for the app as it stands. We'll gut it like a fish next.
 
-![Playlist](/images/ionic-intro/playlist.PNG)
+![Playlist](/assets/img/mobile_hybrid/ionic-intro/playlist.PNG)
+{:.center-image}
 
 # The Lay of the Land
 The side menu Ionic template provides a couple files for us and does some nice
@@ -83,9 +89,71 @@ to have our app load up the weather state of the app when it's loaded.
 We're also going to alter the `www/templates/menu.html` file to include the new items, and remove the otherwise
 that we don't need or have to care about.
 
-<script src="https://gist.github.com/jbasinger/578ecd69413d452e884c.js?file=app.js"></script>
+```js
+.config(function($stateProvider, $urlRouterProvider) {
+  $stateProvider
 
-<script src="https://gist.github.com/jbasinger/578ecd69413d452e884c.js?file=menu.html"></script>
+    .state('app', {
+    url: '/app',
+    abstract: true,
+    templateUrl: 'templates/menu.html'
+  })
+
+  .state('app.weather', {
+    url: '/weather',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/weather.html',
+        controller: 'WeatherCtrl'
+      }
+    }
+  })
+
+  .state('app.about', {
+      url: '/about',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/about.html'
+        }
+      }
+    });
+  // if none of the above states are matched, use this as the fallback
+  $urlRouterProvider.otherwise('/app/weather');
+});
+```
+
+```html
+<ion-side-menus enable-menu-with-back-views="false">
+  <ion-side-menu-content>
+    <ion-nav-bar class="bar-stable">
+      <ion-nav-back-button>
+      </ion-nav-back-button>
+
+      <ion-nav-buttons side="left">
+        <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
+        </button>
+      </ion-nav-buttons>
+    </ion-nav-bar>
+    <ion-nav-view name="menuContent"></ion-nav-view>
+  </ion-side-menu-content>
+
+  <ion-side-menu side="left">
+    <ion-header-bar class="bar-stable">
+      <h1 class="title">Menu</h1>
+    </ion-header-bar>
+    <ion-content>
+      <ion-list>
+        <ion-item menu-close href="#/app/weather">
+          Weather
+        </ion-item>
+        <ion-item menu-close href="#/app/about">
+          About
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ion-side-menu>
+</ion-side-menus>
+```
 
 For the sake of simplicity, we're going to keep the controller we're using in the `controllers.js` file
 Ionic created for us. If this were a larger app, personally, I would separate the controllers into their own files under a `controllers` folder. Keeping things organized will make you happy, so just [do it](https://www.youtube.com/watch?v=nuHfVn_cfHU).
@@ -110,7 +178,31 @@ If there is a problem with the zip code we send the URL, it'll return a JSON str
 parameter of 400. First we'll check if that exists, and reject our promise if that's the case. Otherwise,
 we'll just ship the data we get from the API along to whatever is using the service.
 
-<script src="https://gist.github.com/jbasinger/578ecd69413d452e884c.js?file=weather.js"></script>
+```js
+angular.module('openWeatherMap',[])
+.factory('weather', ['$http', '$q', function($http, $q){
+
+  var weather = {};
+
+  weather.getWeatherByZipCode = function(zipCode){
+    var defered = $q.defer();
+    $http.get('http://api.openweathermap.org/data/2.5/weather?zip=' + zipCode + ',us&units=imperial')
+    .success(function(data, status, headers, config){
+      if(data.cod !=  200){
+        defered.reject(data.message);
+      } else {
+        defered.resolve(data);
+      }
+    })
+    .error(function(data, status, headers, config){
+      defered.reject('Error in API');
+    });
+    return defered.promise;
+  };
+
+  return weather;
+}]);
+```
 
 Back in the `controllers.js` file, add in the module as a dependency to our `starter.controllers` module,
 so we can use it in our `WeatherCtrl` controller.
@@ -124,9 +216,32 @@ For the sake of simplicity, we'll just create an input field, and a button that 
 service and add that zip code to the list of cities we care about. In our list, we can slide the items
 to the left, and reveal a refresh button to reload the data.
 
-<script src="https://gist.github.com/jbasinger/578ecd69413d452e884c.js?file=weather.html"></script>
+```html
+<ion-view view-title="Weather">
+  <ion-content>
+    <label class="item item-input">
+      <input type="text" placeholder="Zip Code" ng-model="input.zipCode">
+    </label>
+    <button class="button button-full button-positive" ng-click="addZipCode()">
+      Add Zip Code
+    </button>
+    <ion-list>
+      <ion-item ng-repeat="weather in cities">
+        <div style="float: left;">
+          {{weather.name}}
+        </div>
+        <div style="float: right;">
+          {{weather.main.temp}} °F
+        </div>
+        <ion-option-button class="button-balanced" ng-click="refresh(weather.zipCode, $index)">Refresh</ion-option-button>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>
+```
 
-![Playlist](/images/ionic-intro/weather.PNG)
+![Weather](/assets/img/mobile_hybrid/ionic-intro/weather.PNG)
+{:.center-image}
 
 ## The Controller
 Here we need to setup some scope variables and functions to make all our buttons and inputs work. First
@@ -150,7 +265,47 @@ Finally, we create the `$scope.refresh` function that takes the zip code passed 
 index of that item in the `$scope.cities` array, gets our zip code data the same way `$scope.addZipCode`
 does and replaces the data we had in that spot with the new data we retrieved.
 
-<script src="https://gist.github.com/jbasinger/578ecd69413d452e884c.js?file=controllers.js"></script>
+```js
+angular.module('starter.controllers', ['openWeatherMap'])
+
+.controller('WeatherCtrl', ['$scope', '$window', 'weather', function($scope, $window, weather) {
+
+  $scope.cities = [];
+  $scope.input = {};
+
+  function onZipCodeData(zipCode, callBack){
+
+    var prom = weather.getWeatherByZipCode(zipCode);
+
+    prom.then(function(data){
+      data.zipCode = zipCode;
+      callBack(data);
+    }).catch(function(msg){
+      $window.alert(msg);
+    }).finally(function(){
+      $scope.input.zipCode = "";
+    });
+
+  }
+
+  $scope.addZipCode = function(){
+
+    var zipCode = $scope.input.zipCode;
+
+    onZipCodeData(zipCode, function(data){
+      $scope.cities.push(data);
+    });
+
+  };
+
+  $scope.refresh = function(zipCode, index){
+    onZipCodeData(zipCode, function(data){
+      $scope.cities[index] = data;
+    });
+  }
+  
+}]);
+```
 
 # The Device
 Everything is looking awesome and now we're ready to see how it looks on our trusty Android. To do this,

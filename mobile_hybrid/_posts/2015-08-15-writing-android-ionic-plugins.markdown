@@ -4,7 +4,11 @@ title:  "Writing Ionic Plugins with Android"
 date:   2015-08-15 19:40:00
 categories: mobile_hybrid
 author: Justin
+image:
+  path: /assets/img/mobile_hybrid/android-ionic-plugins/header.png
 ---
+
+## Writing Ionic Plugins with Android
 
 Sometimes Cordova just doesn't have access to some libraries you'd have access to if you were writing a native application. Maybe you need to do some heavy processing, but don't want to bog down the thread that the Web View runs on. Perhaps there is a third party library you'd love to use, but there isn't a Javascript interface to it.
 
@@ -28,7 +32,30 @@ First, create a directory to house all your files. You'll need everything packag
 
 Here is our example plugin.xml, we'll go over the included tags.
 
-<script src="https://gist.github.com/jbasinger/38e67ecc3d77be86b77e.js?file=plugin.xml"></script>
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="sciencevikinglabs-reverseplugin" version="0.0.1">
+    <name>Reverse</name>
+    <description>Science Vikings Reverse String Plugin</description>
+    <license>MIT</license>
+    <keywords>reverse</keywords>
+    <js-module src="www/reverse.js" name="reverse">
+        <clobbers target="reverse" />
+    </js-module>
+    <platform name="android">
+
+        <config-file target="config.xml" parent="/*">
+            <feature name="Reverse">
+                <param name="android-package" value="com.sciencevikinglabs.reverseplugin.ReversePlugin"/>
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/ReversePlugin.java" target-dir="src/com/sciencevikinglabs/reverseplugin" />
+
+    </platform>
+</plugin>
+```
 
 The root tag is the `<plugin>` tag. This includes the XML Namespace (`xmlns`) an id and a version attribute. The id and version attributes are what show up when you call `ionic plugin ls` in your normal Ionic applications. This tag houses the rest of our tags.
 
@@ -54,7 +81,61 @@ Outside the `<feature>` tag but still within the `<platform>` tag we have the `<
 
 Step two in the process is building the Java side of the plugin that will handle the native code we care about. Here is the Java file for reversing the string.
 
-<script src="https://gist.github.com/jbasinger/38e67ecc3d77be86b77e.js?file=ReversePlugin.java"></script>
+```java
+package com.sciencevikinglabs.reverseplugin;
+
+import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaInterface;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class ReversePlugin extends CordovaPlugin {
+
+
+    /**
+     * Constructor.
+     */
+    public ReversePlugin() {
+    }
+
+    /**
+     * Sets the context of the Command. This can then be used to do things like
+     * get file paths associated with the Activity.
+     *
+     * @param cordova The context of the main Activity.
+     * @param webView The CordovaWebView Cordova is running in.
+     */
+    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+        super.initialize(cordova, webView);
+    }
+
+    /**
+     * Executes the request and returns PluginResult.
+     *
+     * @param action            The action to execute.
+     * @param args              JSONArry of arguments for the plugin.
+     * @param callbackContext   The callback id used when calling back into JavaScript.
+     * @return                  True if the action was valid, false if not.
+     */
+    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+
+      if(action.equals("doIt")){
+        JSONObject r = new JSONObject();
+        r.put("value", new StringBuilder(args.get(0).toString()).reverse().toString());
+        callbackContext.success(r);
+      } else {
+        return false;
+      }
+
+      return true;
+        
+    }
+
+}
+```
 
 Lets start with the very first line. `package com.sciencevikinglabs.reverseplugin;` is setting the namespace of our file. This, along with the name of our class is used in the `value` attribute of the `<param>` tag inside the `<feature>` tag of our `plugin.xml` file.
 
@@ -74,7 +155,20 @@ If an error occurs, you can call the `callbackContext.error` function with a `JS
 
 The final piece of the puzzle is the Javascript interface to the Java plugin. This is actually a node.js type of Javascript file that exports the object that will be put in the spot you defined in the `clobbers` tag of your `plugin.xml` file.
 
-<script src="https://gist.github.com/jbasinger/38e67ecc3d77be86b77e.js?file=reverse.js"></script>
+```js
+var cordova = require('cordova');
+
+function Reverse(){
+
+  this.doIt = function(str, successCallback, errorCallback){
+    successCallback = successCallback || function(){};
+    errorCallback = errorCallback || function(){};
+    cordova.exec(successCallback, errorCallback, "Reverse","doIt",[str]);
+  };
+}
+
+ module.exports = new Reverse();
+ ```
 
 The first thing we do is `require('cordova')`. This lets us fire the `exec` function that will find our Java code and run it for us.
 

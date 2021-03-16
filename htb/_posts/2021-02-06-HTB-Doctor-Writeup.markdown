@@ -5,6 +5,8 @@ date:   2021-02-06 06:00:00
 image: 
   path: /assets/img/htb/HTB-Doctor/Header.png
 author: Ryan
+image: 
+  path: /assets/img/htb/HTB-Doctor/Header.png
 ---
 
 - Table of Contents
