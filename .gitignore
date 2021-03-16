@@ -7,3 +7,4 @@ utils/images/output/**
 utils/images/*.png
 utils/images/*.jpg
 utils/images/*.jpeg
+node_modules
