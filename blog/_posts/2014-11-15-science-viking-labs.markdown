@@ -2,7 +2,6 @@
 layout: post
 title:  "Science Viking Labs"
 date:   2014-11-15 19:28:27
-categories: science
 author: Justin
 ---
 Welcome to Science Viking Labs! We are a group of bearded men out to make life easier through automation.

@@ -2,7 +2,7 @@
 layout: post
 title:  "LeetCode Problem 2 - Add Two Numbers"
 date:   2021-02-10 00:00:00
-categories: "leetcode testing"
+categories: leetcode
 author: Justin
 ---
 
