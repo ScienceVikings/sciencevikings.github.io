@@ -4,6 +4,8 @@ title:  "Hack The Box - Buff Writeup"
 date:   2020-11-21 06:00:00
 categories: "htb"
 author: Ryan
+image: 
+  path: /assets/img/htb/HTB-Buff/Header.png
 ---
 
 *[Hack The Box](https://hackthebox.eu) is an online platform allowing you to test your penetration testing skills and exchange ideas and methodologies with thousands of people in the security field.*  

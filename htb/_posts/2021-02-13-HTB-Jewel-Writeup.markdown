@@ -4,6 +4,8 @@ title:  "Hack The Box - Jewel Writeup"
 date:   2021-02-13 06:00:00
 categories: "htb"
 author: Ryan
+image: 
+  path: /assets/img/htb/HTB-Jewel/Header.png
 ---
 
 *[Hack The Box](https://hackthebox.eu) is an online platform allowing you to test your penetration testing skills and exchange ideas and methodologies with thousands of people in the security field.*  
