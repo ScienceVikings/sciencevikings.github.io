@@ -40,7 +40,38 @@ The above times (in seconds) are based on larger files, as you won't see much ch
 ## Upgrading MD5
 Now that we've got a basic understanding of MD5, let's get rid of it.
 
-<script src="https://gist.github.com/RBoutot/32553b470ccb89b29cde.js?file=updateMD5.py"></script>
+```python
+import os,hashlib,time
+
+monitor=[
+  {'path':'E:\Dropbox\SVL\Projects\AdvancedFIM_GatherFiles','recursive':True},
+  {'path':'E:\Dropbox\SVL\Projects','recursive':False},
+  {'path':'E:\Dropbox\SVL\Projects\BasicFIM\BasicFIM.py','recursive':False}
+]
+files={}
+def getFiles():
+  filesList=[]
+  for x in monitor:
+    if os.path.isdir(x['path']):
+      if x['recursive']:
+        filesList.extend([os.path.join(root, f) for (root, dirs, files) in os.walk(x['path']) for f in files])
+      else:
+        filesList.extend([item for item in os.listdir(x['path']) if os.path.isfile(item)])
+    elif os.path.isfile(x['path']):
+      filesList.append(x['path'])
+  return filesList
+while True:
+  for file in getFiles():
+    hash = hashlib.sha256()
+    with open(file) as f:
+      for chunk in iter(lambda: f.read(2048), ""):
+        hash.update(chunk)
+    sha256 = hash.hexdigest()
+    if file in files and sha256 <> files[file]:
+      print '%s\t%s has been changed!'%(time.strftime("%Y-%m-%d %H:%M:%S") , file)
+    files[file]=sha256
+  time.sleep(1)
+  ```
 
 #### Walk-through:
 Pretty straight forward changes, so we'll go over it quickly. Because we're already importing Python's `hashlib` module, we can access all the [other hashes](https://docs.python.org/2/library/hashlib.html) within it. By simply replacing `hashlib.md5()` with `hashlib.sha256()`, the upgrade process is complete.
@@ -50,7 +81,16 @@ I also went through and renamed all instances of the `md5` variable with `sha356
 ## Retrieve Bytes from files
 In my original post on [Basic File Integrity Monitors](http://sciencevikinglabs.com/building-a-basic-file-integrity-monitor/), I mentioned that some FIMs can actually prevent changes from sticking. Retrieving bytes from our known safe files is the first step towards accomplishing this goal in our own FIM.
 
-<script src="https://gist.github.com/RBoutot/32553b470ccb89b29cde.js?file=getBytes.py"></script>
+```python
+import os,hashlib,base64
+
+file='E:\Dropbox\SVL\Projects\BasicFIM\BasicFIM.py'
+
+def getBytes(file):
+  return base64.b64encode(open(file, "rb").read())
+
+print getBytes(file)
+```
 
 #### Walk-through:
 * **Line 1**: In addition the the `os` and `hashlib` modules you're already familiar with, the `base64` library will be imported as well.
@@ -63,7 +103,40 @@ In my original post on [Basic File Integrity Monitors](http://sciencevikinglabs.
 ## Adding getBytes() to the main script
 Now that we have a working `getBytes()` function going, let's add it to our main script. We'll also want to update our code to store the new data in our `files` variable.
 
-<script src="https://gist.github.com/RBoutot/32553b470ccb89b29cde.js?file=AdvancedFIM_CalculateHash.py"></script>
+```python
+import os,hashlib,time,base64
+
+monitor=[
+  {'path':'E:\Dropbox\SVL\Projects\AdvancedFIM_GatherFiles','recursive':True},
+  {'path':'E:\Dropbox\SVL\Projects','recursive':False},
+  {'path':'E:\Dropbox\SVL\Projects\BasicFIM\BasicFIM.py','recursive':False}
+]
+files={}
+def getFiles():
+  filesList=[]
+  for x in monitor:
+    if os.path.isdir(x['path']):
+      if x['recursive']:
+        filesList.extend([os.path.join(root, f) for (root, dirs, files) in os.walk(x['path']) for f in files])
+      else:
+        filesList.extend([item for item in os.listdir(x['path']) if os.path.isfile(item)])
+    elif os.path.isfile(x['path']):
+      filesList.append(x['path'])
+  return filesList
+def getBytes(file):
+  return base64.b64encode(open(file, "rb").read())
+while True:
+  for file in getFiles():
+    hash = hashlib.sha256()
+    with open(file) as f:
+      for chunk in iter(lambda: f.read(2048), ""):
+        hash.update(chunk)
+    sha256 = hash.hexdigest()
+    if file in files and sha256 <> files[file]['sha256']:
+      print '%s\t%s has been changed!'%(time.strftime("%Y-%m-%d %H:%M:%S") , file)
+    files[file]={'sha256':sha256,'bytes':getBytes(file)}
+  time.sleep(1)
+  ```
 
 ### Walk-through
 * **Line 20**: Added the `getBytes()` function to the script.

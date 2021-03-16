@@ -3,14 +3,14 @@
 layout: grid
 
 # The title of the tag's page.
-title: Hack The Box
+title: Security Tooling
 
 # The name of the tag, used in a post's front matter (e.g. tags: [<slug>]).
-slug: htb
+slug: security
 
 # (Optional) Write a short (~150 characters) description of this featured tag.
 description: >
-  Detailed walkthroughs to retired Hack The Box machines
+  Posts about developing and using security-related tools
 
 # (Optional) You can disable grouping posts by date.
 no_groups: true

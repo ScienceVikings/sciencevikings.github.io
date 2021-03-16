@@ -15,7 +15,21 @@ Hopefully you're caught up with our [previous](http://sciencevikinglabs.com/buil
 ## Configure the Database
 In the current state of the code, every file, hash, and byte are all being held in memory while the program runs. Our goal is to eventually rely on a single version of each file that can be carried over from one scan to the next, acting as a master backup. To accomplish this, we'll need to set up a database to store the data.
 
-<script src="https://gist.github.com/RBoutot/86f35bc3fa283974c33f.js?file=ConfigureDatabase.py"></script>
+```python
+import sqlite3
+
+db = sqlite3.connect('FileIntegrityMonitor.db')
+db.row_factory = sqlite3.Row
+cur=db.cursor()
+
+def configureDatabase():
+  db.execute('CREATE TABLE IF NOT EXISTS Monitor (ID INTEGER PRIMARY KEY AUTOINCREMENT, Path TEXT NOT NULL, Recursive BIT NULL)')
+  db.execute('CREATE TABLE IF NOT EXISTS File (ID INTEGER PRIMARY KEY AUTOINCREMENT, FilePath TEXT NOT NULL)')
+  db.execute('CREATE TABLE IF NOT EXISTS Hash (ID INTEGER PRIMARY KEY AUTOINCREMENT, FileID INTEGER NOT NULL, Hash TEXT NOT NULL)')
+  db.execute('CREATE TABLE IF NOT EXISTS Recovery (ID INTEGER PRIMARY KEY AUTOINCREMENT, FileID INTEGER NOT NULL, Base64 TEXT NOT NULL)')
+  
+configureDatabase()
+```
 
 #### Walk-through:
 * **Line 1**: Our first step is to import the `sqlite3` module. This will be used to create, connect, and query our database.
@@ -27,7 +41,11 @@ In the current state of the code, every file, hash, and byte are all being held 
 ## Adding Paths to Monitor
 Now that we've got our database set up, we'll have to add our paths from the `monitor` variable used in previous scripts. I'm using [SQLiteBrowser](http://sqlitebrowser.org/) to execute these Insert statements, but feel free to use whatever works best for you or even add them to your code.
 
-<script src="https://gist.github.com/RBoutot/86f35bc3fa283974c33f.js?file=InsertData.sql"></script>
+```sql
+INSERT INTO Monitor([Path],[Recursive]) VALUES('C:\Users\Ryan\Dropbox\SVL\Projects\AdvancedFIM_GatherFiles',1);
+INSERT INTO Monitor([Path],[Recursive]) VALUES('C:\Users\Ryan\Dropbox\SVL\Projects',0);
+INSERT INTO Monitor([Path],[Recursive]) VALUES('C:\Users\Ryan\Dropbox\SVL\Projects\BasicFIM\BasicFIM.py',null);
+```
 
 #### Walk-through:
 These scripts are just basic Insert statements. They tell the database what table (`Monitor`) to add the data to, which fields (`Path`, `Recursive`) are being populated, and the values being entered. Notice that we left out the ID field, as it was set to `AUTOINCREMENT` in our previous step. We'll be writing a lot more SQL throughout this post, so take a look at some of these [tutorials](http://www.tutorialspoint.com/sqlite/sqlite_syntax.htm) in case you want to learn more about how it works.
@@ -36,7 +54,31 @@ These scripts are just basic Insert statements. They tell the database what tabl
 ## Initialize Monitored Files
 The first time we run our File Integrity Monitor, it'll need to set up a baseline to work with. This includes identifying all the files we'll need to monitor, their hashes to compare against, and a base64 encoded version of their contents we can eventually restore from.
 
-<script src="https://gist.github.com/RBoutot/86f35bc3fa283974c33f.js?file=InitializeFiles.py"></script>
+```python
+def initializeFiles():
+  for fimFile in getFiles():
+    ID=cur.execute('SELECT ID FROM File WHERE FilePath=?',(fimFile,)).fetchone()
+    if ID == None:
+      cur.execute('INSERT INTO File(FilePath) VALUES(?)',(fimFile,))
+      newID = cur.lastrowid
+      cur.execute('INSERT INTO Hash(FileID,Hash) VALUES(?,?)',(newID,getHash(fimFile),))
+      cur.execute('INSERT INTO Recovery(FileID,Base64) VALUES(?,?)',(newID,getBase64(fimFile),))
+    else:
+      cur.execute('UPDATE Hash SET Hash=? WHERE FileID=?',(getHash(fimFile),ID[0],))
+      cur.execute('UPDATE Recovery SET Base64=? WHERE FileID=?',(getBase64(fimFile),ID[0],))
+  db.commit()
+def getFiles():
+  filesList=[]
+  for x in cur.execute('SELECT * FROM Monitor').fetchall():
+    if os.path.isdir(x['Path']):
+      if x['Recursive']:
+        filesList.extend([os.path.join(root, f) for (root, dirs, files) in os.walk(x['Path']) for f in files])
+      else:
+        filesList.extend([item for item in os.listdir(x['Path']) if os.path.isfile(item)])
+    elif os.path.isfile(x['Path']):
+      filesList.append(x['Path'])
+  return filesList
+  ```
 
 #### Walk-through:
 * **Line 2**: Making a call to our new `getFiles()` function, we can iterate over all the files found in the directories set up in the previous step. 
@@ -52,7 +94,10 @@ The first time we run our File Integrity Monitor, it'll need to set up a baselin
 ## Create Config File
 Another feature we'll be adding is the ability to read from a configuration file. This is where we can store customizable values to change how the tool behaves, without having to modify the source code.
 
-<script src="https://gist.github.com/RBoutot/86f35bc3fa283974c33f.js?file=FileIntegrityMonitor.INI"></script>
+```
+[Timer]
+Wait: 1
+```
 
 #### Walk-through:
 We can name configuration categories by placing them between `[]`, such as the `[Timer]` example above. Any configurations belonging to that category will be placed on the lines below it, and be read until another category is named, or the end of the file is reached. For this simple config file, we'll just add a `Wait`, with the value of 1. Save the file as `FileIntegrityMonitor.ini` in the same directory as our script.
@@ -60,7 +105,14 @@ We can name configuration categories by placing them between `[]`, such as the `
 ## Parsing Config Files
 With the configuration file created, we can test our ability to read from it. This is just a basic demonstration of the functionality we'll be adding to the larger script.
 
-<script src="https://gist.github.com/RBoutot/86f35bc3fa283974c33f.js?file=ConfigParser.py"></script>
+```python
+import configparser
+
+conf = configparser.ConfigParser()
+conf.read('FileIntegrityMonitor.ini')
+
+print(int(conf.get('Timer', 'Wait')))
+```
 
 #### Walk-through:
 * **Line 1**: Start by importing python's `configparser` module.
@@ -73,7 +125,60 @@ With the configuration file created, we can test our ability to read from it. Th
 ## Putting It All Together
 Taking all of our changes, we're able to update the previous version of the tool to include a local database for storage, a `getHash()` function, and the ability to read settings from a configuration file. Lets go over those changes here.
 
-<script src="https://gist.github.com/RBoutot/86f35bc3fa283974c33f.js?file=AdvancedFIM_DataStorage.py"></script>
+```python
+import os,hashlib,time,base64,sqlite3,configparser
+
+db = sqlite3.connect('FileIntegrityMonitor.db')
+db.row_factory = sqlite3.Row
+cur=db.cursor()
+conf = configparser.ConfigParser()
+conf.read('FileIntegrityMonitor.ini')
+def configureDatabase():
+  db.execute('CREATE TABLE IF NOT EXISTS Monitor (ID INTEGER PRIMARY KEY AUTOINCREMENT, Path TEXT NOT NULL, Recursive BIT NULL)')
+  db.execute('CREATE TABLE IF NOT EXISTS File (ID INTEGER PRIMARY KEY AUTOINCREMENT, FilePath TEXT NOT NULL)')
+  db.execute('CREATE TABLE IF NOT EXISTS Hash (ID INTEGER PRIMARY KEY AUTOINCREMENT, FileID INTEGER NOT NULL, Hash TEXT NOT NULL)')
+  db.execute('CREATE TABLE IF NOT EXISTS Recovery (ID INTEGER PRIMARY KEY AUTOINCREMENT, FileID INTEGER NOT NULL, Base64 TEXT NOT NULL)')
+def initializeFiles():
+  for fimFile in getFiles():
+    ID=cur.execute('SELECT ID FROM File WHERE FilePath=?',(fimFile,)).fetchone()
+    if ID == None:
+      cur.execute('INSERT INTO File(FilePath) VALUES(?)',(fimFile,))
+      newID = cur.lastrowid
+      cur.execute('INSERT INTO Hash(FileID,Hash) VALUES(?,?)',(newID,getHash(fimFile),))
+      cur.execute('INSERT INTO Recovery(FileID,Base64) VALUES(?,?)',(newID,getBase64(fimFile),))
+    else:
+      cur.execute('UPDATE Hash SET Hash=? WHERE FileID=?',(getHash(fimFile),ID[0],))
+      cur.execute('UPDATE Recovery SET Base64=? WHERE FileID=?',(getBase64(fimFile),ID[0],))
+  db.commit()
+def getFiles():
+  filesList=[]
+  for x in cur.execute('SELECT * FROM Monitor').fetchall():
+    if os.path.isdir(x['Path']):
+      if x['Recursive']:
+        filesList.extend([os.path.join(root, f) for (root, dirs, files) in os.walk(x['Path']) for f in files])
+      else:
+        filesList.extend([item for item in os.listdir(x['Path']) if os.path.isfile(item)])
+    elif os.path.isfile(x['Path']):
+      filesList.append(x['Path'])
+  return filesList
+def getHash(fimFile):
+  with open(fimFile,"rb") as f:
+    bytes = f.read()
+  return hashlib.sha256(bytes).hexdigest()
+def getBase64(fimFile):
+  return base64.b64encode(open(fimFile, "rb").read())
+configureDatabase()
+initializeFiles()
+files=getFiles()
+
+while True:
+  for fimFile in files:
+    hash=getHash(fimFile)
+    storedFile=cur.execute('SELECT * FROM File F LEFT JOIN Hash H ON F.ID=H.FileID WHERE FilePath=?',(fimFile,)).fetchone()
+    if storedFile != None and hash != storedFile['Hash']:
+      print('%s\t%s has been changed!'%(time.strftime("%Y-%m-%d %H:%M:%S") , fimFile))
+  time.sleep(int(conf.get('Timer', 'Wait')))
+  ```
 
 #### Walk-through:
 * **Line 1**: Here, we're adding the sqlite3 and configparser modules to the import.

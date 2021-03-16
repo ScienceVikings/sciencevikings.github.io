@@ -15,7 +15,14 @@ In our [previous](http://sciencevikinglabs.com/building-a-file-integrity-monitor
 ## Update the Config File
 Because we've already done most of the groundwork, we'll be Keeping this post fairly short and simple. Setting an email account and where to send our alerts is the perfect opportunity to use the configuration file we created previously. 
 
-<script src="https://gist.github.com/RBoutot/e664be73bbb83995c8c6dc15c1d5c8f9.js?file=FileIntegrityMonitor.INI"></script>
+```
+[Timer]
+Wait: 1
+
+[Email]
+Username: {SENDER'S EMAIL}
+Send_To: {DESTINATION EMAIL}
+```
 
 #### Walk-through:
 * **Line 4**: Here we're defining the `Email` section of the config, similar to the `Timer` section above.
@@ -25,7 +32,21 @@ Because we've already done most of the groundwork, we'll be Keeping this post fa
 ## Sending Emails
 This section is the bulk of the code we'll be adding to the main script. As you can see, it doesn't take much effort on our part to send an email. They are lots of other options for sending alerts if you want to get creative. You could look at using SMS, Slack, Discord, or even push notifications.
 
-<script src="https://gist.github.com/RBoutot/e664be73bbb83995c8c6dc15c1d5c8f9.js?file=EmailAlerts.py"></script>
+```python
+sender_email = 'sender@gmail.com'
+receiver_email = 'destination@email.com'
+password = getpass('Email Password: ')
+
+msg = MIMEText(message)
+msg['Subject'] = 'Alert - File Change Detected'
+msg['From'] = sender_email
+msg['To'] = receiver_email
+
+with smtplib.SMTP("smtp.gmail.com", 587) as server:
+  server.starttls(context=ssl.create_default_context())
+  server.login(sender_email, password)
+  server.sendmail(sender_email, receiver_email, msg.as_string())
+  ```
 
 #### Walk-through:
 * **Lines 1-2**: These variables are where we define who we'll be sending emails as, and who will be recieving them. For testing purposes, we can just define them as strings rather than load them from the config.
@@ -38,7 +59,79 @@ This section is the bulk of the code we'll be adding to the main script. As you 
 ## Putting It All Together
 Taking our email code, we're able to update the previous version of the tool with not a whole lot of changes. The full updated script is below.
 
-<script src="https://gist.github.com/RBoutot/e664be73bbb83995c8c6dc15c1d5c8f9.js?file=AdvancedFIM_EmailAlerts.py"></script>
+```python
+import os,hashlib,time,base64,sqlite3,configparser,smtplib,ssl
+from email.mime.text import MIMEText
+from getpass import getpass
+
+db = sqlite3.connect('FileIntegrityMonitor.db')
+db.row_factory = sqlite3.Row
+cur=db.cursor()
+conf = configparser.ConfigParser()
+conf.read('FileIntegrityMonitor.ini')
+def configureDatabase():
+	db.execute('CREATE TABLE IF NOT EXISTS Monitor (ID INTEGER PRIMARY KEY AUTOINCREMENT, Path TEXT NOT NULL, Recursive BIT NULL)')
+	db.execute('CREATE TABLE IF NOT EXISTS File (ID INTEGER PRIMARY KEY AUTOINCREMENT, FilePath TEXT NOT NULL)')
+	db.execute('CREATE TABLE IF NOT EXISTS Hash (ID INTEGER PRIMARY KEY AUTOINCREMENT, FileID INTEGER NOT NULL, Hash TEXT NOT NULL)')
+	db.execute('CREATE TABLE IF NOT EXISTS Recovery (ID INTEGER PRIMARY KEY AUTOINCREMENT, FileID INTEGER NOT NULL, Base64 TEXT NOT NULL)')
+def initializeFiles():
+	for fimFile in getFiles():
+		ID=cur.execute('SELECT ID FROM File WHERE FilePath=?',(fimFile,)).fetchone()
+		if ID == None:
+			cur.execute('INSERT INTO File(FilePath) VALUES(?)',(fimFile,))
+			newID = cur.lastrowid
+			cur.execute('INSERT INTO Hash(FileID,Hash) VALUES(?,?)',(newID,getHash(fimFile),))
+			cur.execute('INSERT INTO Recovery(FileID,Base64) VALUES(?,?)',(newID,getBase64(fimFile),))
+		else:
+			cur.execute('UPDATE Hash SET Hash=? WHERE FileID=?',(getHash(fimFile),ID[0],))
+			cur.execute('UPDATE Recovery SET Base64=? WHERE FileID=?',(getBase64(fimFile),ID[0],))
+	db.commit()
+def getFiles():
+	filesList=[]
+	for x in cur.execute('SELECT * FROM Monitor').fetchall():
+		if os.path.isdir(x['Path']):
+			if x['Recursive']:
+				filesList.extend([os.path.join(root, f) for (root, dirs, files) in os.walk(x['Path']) for f in files])
+			else:
+				filesList.extend([item for item in os.listdir(x['Path']) if os.path.isfile(item)])
+		elif os.path.isfile(x['Path']):
+			filesList.append(x['Path'])
+	return filesList
+def getHash(fimFile):
+	with open(fimFile,"rb") as f:
+		bytes = f.read()
+	return hashlib.sha256(bytes).hexdigest()
+def getBase64(fimFile):
+	return base64.b64encode(open(fimFile, "rb").read())
+def sendAlert(alert):
+	sender_email = conf.get('Email', 'Username')
+	receiver_email = conf.get('Email', 'Send_To')
+
+	msg = MIMEText(alert)
+	msg['Subject'] = 'Alert - File Change Detected'
+	msg['From'] = sender_email
+	msg['To'] = receiver_email
+
+	context = ssl.create_default_context()
+	with smtplib.SMTP("smtp.gmail.com", 587) as server:
+		server.starttls(context=context)
+		server.login(sender_email, password)
+		server.sendmail(sender_email, receiver_email, msg.as_string())
+
+configureDatabase()
+initializeFiles()
+files=getFiles()
+password = getpass('Email Password: ')
+
+while True:
+	for fimFile in files:
+		hash=getHash(fimFile)
+		storedFile=cur.execute('SELECT * FROM File F LEFT JOIN Hash H ON F.ID=H.FileID WHERE FilePath=?',(fimFile,)).fetchone()
+		if storedFile != None and hash != storedFile['Hash']:
+			sendAlert('%s:\t%s has been changed!'%(time.strftime("%Y-%m-%d %H:%M:%S") , fimFile))
+			exit()
+	time.sleep(int(conf.get('Timer', 'Wait')))
+```
 
 #### Walk-through:
 * **Lines 1-3**: We start by adding the `smtplib` and `ssl` modules, followed by `MIMEText` and `getpass`.

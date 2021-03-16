@@ -5,8 +5,6 @@ date:   2020-12-12 06:00:00
 image: 
   path: /assets/img/htb/HTB-OpenKeyS/Header.png
 author: Ryan
-image: 
-  path: /assets/img/htb/HTB-OpenKeyS/Header.png
 ---
 
 - Table of Contents

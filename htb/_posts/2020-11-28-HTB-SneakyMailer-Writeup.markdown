@@ -5,8 +5,6 @@ date:   2020-11-28 06:00:00
 image: 
   path: /assets/img/htb/HTB-SneakyMailer/Header.png
 author: Ryan
-image: 
-  path: /assets/img/htb/HTB-SneakyMailer/Header.png
 ---
 
 - Table of Contents

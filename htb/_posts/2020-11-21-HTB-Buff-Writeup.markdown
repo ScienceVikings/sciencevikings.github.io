@@ -3,10 +3,8 @@ layout: post
 title:  "Hack The Box - Buff Writeup"
 date:   2020-11-21 06:00:00
 image: 
-  path: /assets/img/htb/HTB-Academy/Header.png
-author: Ryan
-image: 
   path: /assets/img/htb/HTB-Buff/Header.png
+author: Ryan
 ---
 
 - Table of Contents

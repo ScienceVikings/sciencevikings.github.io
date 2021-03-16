@@ -5,8 +5,6 @@ date:   2021-01-30 00:00:00
 image: 
   path: /assets/img/htb/HTB-Worker/Header.png
 author: Ryan
-image: 
-  path: /assets/img/htb/HTB-Worker/Header.png
 ---
 
 - Table of Contents

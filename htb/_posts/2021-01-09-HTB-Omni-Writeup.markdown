@@ -5,8 +5,6 @@ date:   2021-01-09 06:00:00
 image: 
   path: /assets/img/htb/HTB-Academy/Header.png
 author: Ryan
-image: 
-  path: /assets/img/htb/HTB-Omni/Header.png
 ---
 
 - Table of Contents

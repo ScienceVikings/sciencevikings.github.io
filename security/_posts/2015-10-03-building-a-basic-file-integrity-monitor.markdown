@@ -18,7 +18,12 @@ File Integrity Monitoring systems are great for notifying users when important f
 ## Getting the files to monitor
 The first step we'll take, is to gather up all the files in our script's directory. After all, we need something to monitor, right?
 
-<script src="https://gist.github.com/RBoutot/45e76f0c60a8438ac8d6.js?file=GetFiles.py"></script>
+```python
+import os
+
+for file in [item for item in os.listdir('.') if os.path.isfile(item)]:
+  print file
+```
 
 #### Walk-through:
 
@@ -35,7 +40,17 @@ The first step we'll take, is to gather up all the files in our script's directo
 ## Calculating the hash
 There are many different types of hashes to chose from, all with varying speeds and levels of security. In a production-level FIM, you'll want to take things like calculation speed and collisions into account, but for the purposes of this post, we'll use [MD5](https://en.wikipedia.org/wiki/MD5).
 
-<script src="https://gist.github.com/RBoutot/45e76f0c60a8438ac8d6.js?file=CalculateHash.py"></script>
+```python
+import os,hashlib
+
+for file in [item for item in os.listdir('.') if os.path.isfile(item)]:
+  hash = hashlib.md5()
+  with open(file) as f:
+    for chunk in iter(lambda: f.read(2048), ""):
+      hash.update(chunk)
+  md5 = hash.hexdigest()
+  print file,md5
+  ```
 
 #### Walk-through:
 
@@ -52,7 +67,19 @@ There are many different types of hashes to chose from, all with varying speeds 
 ## Storing Hashes
 So now that you've got your files hashed, it's time to put them some place where you can access them later.
 
-<script src="https://gist.github.com/RBoutot/45e76f0c60a8438ac8d6.js?file=StoreHash.py"></script>
+```python
+import os,hashlib
+
+files={}
+for file in [item for item in os.listdir('.') if os.path.isfile(item)]:
+  hash = hashlib.md5()
+  with open(file) as f:
+    for chunk in iter(lambda: f.read(2048), ""):
+      hash.update(chunk)
+  md5 = hash.hexdigest()
+  files[file]=md5
+print files
+```
 
 #### Walk-through:
 
@@ -65,7 +92,19 @@ So now that you've got your files hashed, it's time to put them some place where
 ## Send a useful alert
 Here's where you get to be creative! When it comes to alerting, you have a number of options to choose from. Customize the format, come up with a creative message, write to the console, send an email or text message, the possibilities are endless!
 
-<script src="https://gist.github.com/RBoutot/45e76f0c60a8438ac8d6.js?file=SendAlert.py"></script>
+```python
+import os,hashlib,time
+
+files={}
+for file in [item for item in os.listdir('.') if os.path.isfile(item)]:
+  hash = hashlib.md5()
+  with open(file) as f:
+    for chunk in iter(lambda: f.read(2048), ""):
+      hash.update(chunk)
+  md5 = hash.hexdigest()
+  print '%s\t%s has been changed!'%(time.strftime("%Y-%m-%d %H:%M:%S") , file)
+  files[file]=md5
+  ```
 
 #### Walk-through:
 
@@ -80,7 +119,20 @@ Here's where you get to be creative! When it comes to alerting, you have a numbe
 ## Detecting the change
 Because we trust the baseline hashes and only want to be alerted when they change, we need to add some sort of check to prevent our alert from always going off.
 
-<script src="https://gist.github.com/RBoutot/45e76f0c60a8438ac8d6.js?file=DetectChanges.py"></script>
+```python
+import os,hashlib,time
+
+files={}
+for file in [item for item in os.listdir('.') if os.path.isfile(item)]:
+  hash = hashlib.md5()
+  with open(file) as f:
+    for chunk in iter(lambda: f.read(2048), ""):
+      hash.update(chunk)
+  md5 = hash.hexdigest()
+  if file in files and md5 <> files[file]:
+      print '%s\t%s has been changed!'%(time.strftime("%Y-%m-%d %H:%M:%S") , file)
+  files[file]=md5
+  ```
 
 #### Walk-through:
 
@@ -92,7 +144,22 @@ After this step, you shouldn't see anything! But that will change shortly...
 ## Continuously Monitor
 So far, you've scanned your directory, picked out the files, collected their hashes, and added alerts. For this final step, we'll throw it all in a loop to keep the code running and start the monitoring.
 
-<script src="https://gist.github.com/RBoutot/45e76f0c60a8438ac8d6.js?file=ContinuousMonitor.py"></script>
+```python
+import os,hashlib,time
+
+files={}
+while True:
+  for file in [item for item in os.listdir('.') if os.path.isfile(item)]:
+    hash = hashlib.md5()
+    with open(file) as f:
+      for chunk in iter(lambda: f.read(2048), ""):
+        hash.update(chunk)
+    md5 = hash.hexdigest()
+    if file in files and md5 <> files[file]:
+      print '%s\t%s has been changed!'%(time.strftime("%Y-%m-%d %H:%M:%S") , file)
+    files[file]=md5
+  time.sleep(1)
+  ```
 
 #### Walk-through:
 
