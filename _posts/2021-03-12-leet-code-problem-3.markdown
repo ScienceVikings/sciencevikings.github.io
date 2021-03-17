@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "LeetCode Problem 3 - Longest Substring Without Repeating Characters"
-date:   2021-03-17 00:00:00
+date:   2021-03-12 00:00:00
 categories: "leetcode testing"
 author: Justin
 ---
