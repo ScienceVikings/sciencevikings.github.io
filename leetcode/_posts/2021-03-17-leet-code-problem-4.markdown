@@ -4,6 +4,8 @@ title:  "LeetCode Problem 4 - Median of Two Sorted Arrays"
 date:   2021-03-17 00:00:00
 categories: leetcode
 author: Justin
+image: 
+  path: /assets/img/leetcode/00004_Median_Of_Two_Sorted_Arrays/header.png
 ---
 
 ## LeetCode Problem 4 - Median of Two Sorted Arrays

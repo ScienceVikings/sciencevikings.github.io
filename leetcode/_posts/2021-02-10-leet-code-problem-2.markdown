@@ -4,6 +4,8 @@ title:  "LeetCode Problem 2 - Add Two Numbers"
 date:   2021-02-10 00:00:00
 categories: leetcode
 author: Justin
+image: 
+  path: /assets/img/leetcode/00002_Add_Two_Numbers/header.png
 ---
 
 ## LeetCode Problem 2 - Add Two Numbers

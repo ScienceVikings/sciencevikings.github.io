@@ -60,7 +60,13 @@ composite -compose atop -gravity center _difficulty_text.png _difficulty_rect.pn
 composite -compose atop -gravity center -geometry +140+25 _problem_num.png _logo.png _logo.png #Problem number line
 composite -compose atop -gravity center -geometry +140+160 _title.png _logo.png _logo.png #Problem Title
 composite -compose atop -gravity west -geometry +0+60 _difficulty.png _logo.png _logo.png #Difficulty Rect
-convert -bordercolor white -border 20 _logo.png leetcode_"$NUM"_header.png #final
+convert -bordercolor white -border 100x20 _logo.png ../leetcode_"$NUM"_header.png #final
+
+#now resize
+cd ..
+./resize.sh leetcode_"$NUM"_header.png
+
+cd leetcode
 
 rm _*.png
 rm leetcode_problems

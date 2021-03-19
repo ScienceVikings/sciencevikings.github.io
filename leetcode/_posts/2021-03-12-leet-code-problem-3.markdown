@@ -4,6 +4,8 @@ title:  "LeetCode Problem 3 - Longest Substring Without Repeating Characters"
 date:   2021-03-17 00:00:00
 categories: leetcode
 author: Justin
+image: 
+  path: /assets/img/leetcode/00003_Longest_Substring_Without_Repeating_Characters/header.png
 ---
 
 ## LeetCode Problem 3 - Longest Substring Without Repeating Characters

@@ -4,6 +4,8 @@ title:  "LeetCode Problem 5 - Longest Palindromic Substring"
 date:   2021-03-24 00:00:00
 categories: leetcode
 author: Justin
+image: 
+  path: /assets/img/leetcode/00005_Longest_Palindromic_Substring/header.png
 ---
 
 ## LeetCode Problem 5 - Longest Palindromic Substring
