@@ -9,3 +9,4 @@ utils/images/*.jpg
 utils/images/*.jpeg
 node_modules
 leetcode_problems
+leetcode_*_header.png
