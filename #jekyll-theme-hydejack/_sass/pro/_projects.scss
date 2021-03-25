@@ -131,4 +131,80 @@ main:not(.layout-resume) {
       font-size: 1rem;
     }
   }
+
+  .teammate-card {
+    @extend .color-transition;
+    width: 100%;
+    color: var(--gray-text);
+    background-color: var(--gray-bg);
+    padding-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: .125rem .125rem 1rem rgba(0, 0, 0, 0.2);
+    contain: content;
+    border-radius: $border-radius;
+
+    page-break-inside: avoid;
+
+    transition: transform 500ms ease;
+    will-change: transform;
+    &:hover {
+      transform: translateY(-0.25rem);
+      transition: transform 250ms ease;
+    }
+
+    > a.flip-teammate {
+      display: block;
+
+      .teammate-card-img {
+        margin-bottom: 0;
+        img { 
+          display: block; 
+          border-top-left-radius: $border-radius;
+          border-top-right-radius: $border-radius;
+        }
+      }
+    }
+
+    a {
+      position: relative;
+      z-index: 1;
+
+      &.fill-card {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0; 
+        bottom: 0;
+        z-index: 0;
+      }
+    }
+
+    > .teammate-card-title, > .teammate-card-text {
+      text-align: center;
+      padding: 0 1rem;
+    }
+
+    > .teammate-card-title {
+      display: block;
+      font-size: 1.08rem;
+      margin-top: .75rem;
+      margin-bottom: .25rem;
+      color: inherit;
+    }
+
+    > .teammate-card-text {
+      margin: .25rem 0;
+    }
+  }
+
+  .column-1 > .teammate-card {
+    > .teammate-card-title {
+      font-size: 1.2rem;
+    }
+
+    > .teammate-card-text {
+      font-size: 1rem;
+    }
+  }
 }
