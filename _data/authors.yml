@@ -16,7 +16,7 @@ Ryan:
   # Used at the bottom of each page and at the top of the `about` layout
   # Markdown enabled, can use multiple paragraphs (enabled by `|`)
   about:             |
-    Offensive Security Engineer, Full Stack Dev, Avid Homebrewer
+    Offensive Security Engineer, Full Stack Software Engineer, Avid Homebrewer
 
   # This photo will be used in the about section
   picture:
