@@ -51,7 +51,23 @@ the quality of your code. Your product is only as good as your tests. That said,
 
 To fascilitate testing, I wrote a function that will find the median of a list of numbers for us.
 
-<script src="https://gist.github.com/jbasinger/6b91ff76b2a2c76d55f7770bf5b8e509.js?file=median.cs"></script>
+```csharp
+public static double MedianOfArray(int[] nums)
+{
+    if (nums.Length == 0)
+        return 0;
+
+    if (nums.Length == 1)
+        return nums[0];
+
+    if (nums.Length % 2 == 0)
+    {
+        return ((double) (nums[nums.Length / 2] + nums[(nums.Length / 2) - 1])) / 2;
+    }
+
+    return nums[nums.Length/2];
+}
+```
 
 Now, in the unit tests we can pass it the merged list and check our solution against that making it easier to test everything.
 
@@ -71,23 +87,98 @@ you need to average the two median numbers as well.
 
 I'll keep the opposite test cases at a minimum for the sake of breavity. Please enjoy my crude ASCII art comment examples as well!
 
-<script src="https://gist.github.com/jbasinger/6b91ff76b2a2c76d55f7770bf5b8e509.js?file=AllALessThanB.cs"></script>
+```csharp
+/*
+ * A [--|--]
+ * B            [--|--]
+ */
+[Test]
+public void AllOfAIsLessThanB()
+{
+    var nums1 = new int[]{1,2,3,4};
+    var nums2 = new int[]{10,11,12,13,14};
+    var appended = new int[] {1, 2, 3, 4, 10, 11, 12, 13, 14};
+    var val = MedianOfTwoSortedArrays_Problem.MedianOfArray(appended);
+    _sut.FindMedianSortedArrays(nums1, nums2).ShouldBe(val);
+}
+```
 
 Now lets setup a test case when both A and B are different, but their medians happen to be the same.
 
-<script src="https://gist.github.com/jbasinger/6b91ff76b2a2c76d55f7770bf5b8e509.js?file=AndBMedianEqual.cs"></script>
+```csharp
+/*
+ * A   [--|--]
+ * B [----|---]
+ */
+[Test]
+public void AandBMediansAreEqual()
+{
+    var nums1 = new int[]{1,1,2,3,4};
+    var nums2 = new int[]{0,1,2,3,4};
+    var appended = new int[] {0, 1, 1, 1, 2, 2, 3, 3, 4, 4};
+    var val = MedianOfTwoSortedArrays_Problem.MedianOfArray(appended);
+    _sut.FindMedianSortedArrays(nums1, nums2).ShouldBe(val);
+}
+```
 
 We can also think about what would happen if A had a subset of B, but the median of A was less than B.
 
-<script src="https://gist.github.com/jbasinger/6b91ff76b2a2c76d55f7770bf5b8e509.js?file=MedianALessThanMedianB.cs"></script>
+```csharp
+/*
+ * A [--|---]
+ * B  [---|--]
+ */
+[Test]
+public void AisInBbutLessThanBMedian()
+{
+    var nums1 = new int[]{-1,0,1,2,3,4};
+    var nums2 = new int[]{0,1,2,3,4};
+    var appended = new int[] {-1,0,0,1,1,2,2,3,3,4,4};
+    var val = MedianOfTwoSortedArrays_Problem.MedianOfArray(appended);
+    _sut.FindMedianSortedArrays(nums1, nums2).ShouldBe(val);
+}
+```
 
 Another case I thought of was what if they are, basically, completely mixed in with one another and alternate. For example A is all even numbers and B is all odd.
 
-<script src="https://gist.github.com/jbasinger/6b91ff76b2a2c76d55f7770bf5b8e509.js?file=AllMixedIn.cs"></script>
+```csharp
+[Test]
+public void AllMixedIn()
+{
+    var nums1 = new int[] {0, 2, 4, 6, 8};
+    var nums2 = new int[] {1, 3, 5, 7, 9};
+    var appended = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    var val = MedianOfTwoSortedArrays_Problem.MedianOfArray(appended);
+    _sut.FindMedianSortedArrays(nums1, nums2).ShouldBe(val);
+
+    nums1 = new int[] {2, 4, 6, 8};
+    nums2 = new int[] {1, 3, 5, 7};
+    appended = new int[] {1, 2, 3, 4, 5, 6, 7, 8};
+    val = MedianOfTwoSortedArrays_Problem.MedianOfArray(appended);
+    _sut.FindMedianSortedArrays(nums1, nums2).ShouldBe(val);
+}
+```
 
 And finally, a couple weird ones I thought were neat. One where the entirety of A lands somewhere in B and the other where A is all the same number, and B carries on a bit.
 
-<script src="https://gist.github.com/jbasinger/6b91ff76b2a2c76d55f7770bf5b8e509.js?file=WeirdOnes.cs"></script>
+```csharp
+[Test]
+public void WeirdOnesIThoughtWereNeat()
+{
+    var nums1 = new int[]{1,1,1,100,100,100};
+    var nums2 = new int[]{50,50,50};
+    var appended = new int[] {1,1,1,50,50,50,100,100,100};
+    var val = MedianOfTwoSortedArrays_Problem.MedianOfArray(appended);
+    _sut.FindMedianSortedArrays(nums1, nums2).ShouldBe(val);
+
+    nums1 = new int[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    nums2 = new int[] {1, 2, 3, 4, 5};
+    appended = new int[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5};
+    val = MedianOfTwoSortedArrays_Problem.MedianOfArray(appended);
+    _sut.FindMedianSortedArrays(nums1, nums2).ShouldBe(val);
+
+}
+```
 
 Some of these cases are a bit redundant, but I like knowing that my code will cover things the way I think about them and I'm willing to sacrifice a little bit of test
 efficiency for that piece of mind.
@@ -120,7 +211,55 @@ Bi, then we added that number to the new array and incremented Ai and visa versa
 
 Here is the final function with all the checks for empty arrays and what not.
 
-<script src="https://gist.github.com/jbasinger/6b91ff76b2a2c76d55f7770bf5b8e509.js?file=solution.cs"></script>
+```csharp
+public double FindMedianSortedArrays(int[] nums1, int[] nums2)
+{
+
+    if (nums1.Length == 0 && nums2.Length == 0)
+        return 0;
+
+    if (nums1.Length == 0)
+        return MedianOfArray(nums2);
+
+    if (nums2.Length == 0)
+        return MedianOfArray(nums1);
+
+    var totalLength = nums1.Length + nums2.Length;
+    var arrLength = totalLength / 2+1;
+
+    var buf = new int[arrLength];
+    var Ai = 0;
+    var Bi = 0;
+    for (int i = 0; i < arrLength; i++)
+    {
+        if (Ai == nums1.Length)
+        {
+            buf[i] = nums2[Bi++];
+            continue;
+        }
+
+        if (Bi == nums2.Length)
+        {
+            buf[i] = nums1[Ai++];
+            continue;
+        }
+
+
+        if (nums1[Ai] < nums2[Bi])
+            buf[i] = nums1[Ai++];
+        else
+            buf[i] = nums2[Bi++];
+
+    }
+
+    if (totalLength % 2 == 0)
+    {
+        return (buf[arrLength - 1] + buf[arrLength - 2]) / 2d;
+    }
+    return buf[arrLength - 1];
+
+}
+```
 
 The time complexity of this solution is `O(N)` and I know what you're thinking, "but you cut the total length in half!" and I certainly did. Remember, that N times a constant in time complexity, is still 
 just N. So, `O(N/2)` still turns out to be `O(N)`. This is unintuitive, to say the least, and maybe I can shed some light on it. Time complexity factors in the worst case, lets say that A was much, much longer

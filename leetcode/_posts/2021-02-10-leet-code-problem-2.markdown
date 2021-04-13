@@ -50,7 +50,20 @@ This would result in the output `1001`.
 
 The problem provides you with a class definition for a linked list.
 
-<script src="https://gist.github.com/jbasinger/b39b41a9b384531b84816cfe2a18d73f.js?file=listnode.cs"></script>
+```csharp
+public class ListNode
+{
+    public int val;
+    public ListNode next;
+
+    public ListNode(int val = 0, ListNode next = null)
+    {
+        this.val = val;
+        this.next = next;
+    }
+
+}
+```
 
 A linked list is made up of nodes. Each node contains a piece of information, which is its value or data, and then a pointer to another node. These nodes pointing to other nodes, makes a chain. If the next pointer in the chain is nothing, or `null`, then we know that we are at the end of the list and should stop.
 
@@ -69,11 +82,64 @@ This is a particularly fun problem because there are some interesting edge cases
 
 Below you'll see two helper functions I wrote to facilitate testing. The first builds a list for us from an array. The second takes a list, and outputs the array value.
 
-<script src="https://gist.github.com/jbasinger/b39b41a9b384531b84816cfe2a18d73f.js?file=test_helpers.cs"></script>
+```csharp
+public ListNode BuildList(int[] input,int index=0)
+{
+    return index+1 < input.Length ? new ListNode(input[index], BuildList(input, ++index)) : new ListNode(input[index]);
+}
+
+public int[] Output(ListNode n)
+{
+    var res = new List<int>();
+    var node = n;
+    while (node != null)
+    {
+        res.Add(node.val);
+        node = node.next;
+    }
+
+    return res.ToArray();
+}
+```
 
 With these functions, we can now input an array of numbers to get our list, then take the resulting list of our solution and check it's output to make sure it's correct. But, we need to make sure that part is working correctly as well, so here is a test checking those functions.
 
-<script src="https://gist.github.com/jbasinger/b39b41a9b384531b84816cfe2a18d73f.js?file=test_helper_test.cs"></script>
+```csharp
+[Test]
+public void ShouldBuildListNodeFromIntArray()
+{
+    var sut = new AddTwoNumbers_Problem();
+
+    var input = new[] {2, 4, 3};
+    var node = sut.BuildList(input);
+    input.ShouldBe(sut.Output(node));
+
+    input = new[] {5, 6, 4};
+    node = sut.BuildList(input);
+    input.ShouldBe(sut.Output(node));
+
+    input = new[] {9, 9, 9};
+    node = sut.BuildList(input);
+    input.ShouldBe(sut.Output(node));
+
+    input = new[] {0, 0, 0, 1};
+    node = sut.BuildList(input);
+    input.ShouldBe(sut.Output(node));
+
+    input = new[] {7, 0, 8};
+    node = sut.BuildList(input);
+    input.ShouldBe(sut.Output(node));
+
+    input = new[] {1};
+    node = sut.BuildList(input);
+    input.ShouldBe(sut.Output(node));
+
+    input = new[] {0};
+    node = sut.BuildList(input);
+    input.ShouldBe(sut.Output(node));
+
+}
+```
 
 Since the two helper functions do the opposite of each other, we can test them against each other to make sure we get the original input array as a result.
 
@@ -86,7 +152,34 @@ Now that we have our helper functions setup and tested, lets think about this pr
 
 Now that we have some edge cases to think about, lets setup those kinds of tests
 
-<script src="https://gist.github.com/jbasinger/b39b41a9b384531b84816cfe2a18d73f.js?file=twonum_tests.cs"></script>
+```csharp
+[Test]
+public void ShouldAddNumbers()
+{
+    var sut = new AddTwoNumbers_Problem();
+
+    var l1 = sut.BuildList(new[] {2, 4, 3});
+    var l2 = sut.BuildList(new[] {5,6,4});
+    var res = sut.AddTwoNumbers(l1, l2);
+    sut.Output(res).ShouldBe(new[] {7, 0, 8});
+
+    l1 = sut.BuildList(new[] {0});
+    l2 = sut.BuildList(new[] {0});
+    res = sut.AddTwoNumbers(l1, l2);
+    sut.Output(res).ShouldBe(new[] {0});
+
+    l1 = sut.BuildList(new[] {9,9,9});
+    l2 = sut.BuildList(new[] {9});
+    res = sut.AddTwoNumbers(l1, l2);
+    sut.Output(res).ShouldBe(new[] {8,0,0,1});
+
+    l1 = sut.BuildList(new[] {9,9,9,9,9,9,9});
+    l2 = sut.BuildList(new[] {9,9,9,9});
+    res = sut.AddTwoNumbers(l1, l2);
+    sut.Output(res).ShouldBe(new[] {8,9,9,9,0,0,0,1});
+
+}
+```
 
 ### The Solution
 
@@ -95,7 +188,32 @@ Be careful though, if there is no such case, it can cause a stack overflow or an
 
 Here is my solution:
 
-<script src="https://gist.github.com/jbasinger/b39b41a9b384531b84816cfe2a18d73f.js?file=solution.cs"></script>
+```csharp
+public ListNode AddTwoNumbers(ListNode l1, ListNode l2)
+{
+    return SumLists(l1, l2, 0);
+}
+
+public ListNode SumLists(ListNode l1, ListNode l2, int carry)
+{
+    if (l1 == null && l2 == null && carry == 0)
+    {
+        return null;
+    }
+    var val1 = l1 == null ? 0 : l1.val;
+    var val2 = l2 == null ? 0 : l2.val;
+
+    var sum = val1 + val2 + carry;
+
+    carry = sum >= 10 ? 1 : 0;
+    if (carry == 1)
+    {
+        sum -= 10;
+    }
+
+    return new ListNode(sum, SumLists(l1?.next, l2?.next, carry));
+}
+```
 
 As you can see, the `AddTwoNumbers` function just passes in the two lists we're working with and a `carry` of `0`, because we haven't done any calculations yet, so we have nothing left over.
 

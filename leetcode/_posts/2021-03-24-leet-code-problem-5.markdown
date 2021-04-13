@@ -44,12 +44,42 @@ extra whitespace and strings fo length 1. But, for this problem we need to figur
 The first few that stick out to me are the cases where the palindrome is in the beginning of the string, make up the end of the string, or are smack dab in
 the middle.
 
-<script src="https://gist.github.com/jbasinger/c5245eb8fcb7e9c05e4430a95d7aee22.js?file=tests1.cs"></script>
+```csharp
+[Test]
+public void PalindromeInTheBeginning()
+{
+    _sut.LongestPalindrome("babad").ShouldBe("bab");
+}
+
+[Test]
+public void PalindromeInTheMiddle()
+{
+    _sut.LongestPalindrome("cbbd").ShouldBe("bb");
+}
+
+[Test]
+public void PalindromeAtTheEnd()
+{
+    _sut.LongestPalindrome("asedad").ShouldBe("dad");
+}
+```
 
 Once I started working on solving those cases, I knew there had to be a couple more weird ones. I re-read the question to make sure I didn't miss anything simple
 and sure enough I did. What if the entire string is the palindrome, or there is no palindrome at all? 
 
-<script src="https://gist.github.com/jbasinger/c5245eb8fcb7e9c05e4430a95d7aee22.js?file=tests2.cs"></script>
+```csharp
+[Test]
+public void PalindromeIsTheWholeString()
+{
+    _sut.LongestPalindrome("racecar").ShouldBe("racecar");
+}
+
+[Test]
+public void NoPalindromes()
+{
+    _sut.LongestPalindrome("ab").ShouldBe("a");
+}
+```
 
 ### The Solution
 
@@ -68,7 +98,57 @@ almost 20%!
 
 Here is my function for finding the longest palindrome.
 
-<script src="https://gist.github.com/jbasinger/c5245eb8fcb7e9c05e4430a95d7aee22.js?file=solution.cs"></script>
+```csharp
+public string LongestPalindrome(string s)
+{
+    if (s.Length == 0 || s.Length==1)
+        return s;
+
+    var longestPali = s[0].ToString();
+
+    for (var i = 0; i < s.Length; i++)
+    {
+        //Walk backward until you find the same character then start looking for a palindrome
+        for (var j = s.Length - 1; j >= i; j--)
+        {
+            if (s[i] == s[j]) //Potential Palindrome
+            {
+
+                var len = j - i+1;
+
+                //If the length is smaller than our current one, why bother!
+                if (len <= longestPali.Length)
+                    continue;
+
+                var isPalindrome = true;
+                var tempPali = new char[len];
+
+                for (int front = i, back = j, first = 0, last = len-1; front <= back; front++, back--, first++, last--)
+                {
+                    if (s[front] != s[back])
+                    {
+                        isPalindrome = false;
+                        break;
+                    }
+
+                    tempPali[first] = s[front];
+                    tempPali[last] = s[back];
+                }
+
+                var newPali = new string(tempPali);
+                if (isPalindrome && newPali.Length > longestPali.Length)
+                {
+                    longestPali = newPali;
+                }
+
+            }
+        }
+
+    }
+
+    return longestPali;
+}
+```
 
 ### Conclusion
 

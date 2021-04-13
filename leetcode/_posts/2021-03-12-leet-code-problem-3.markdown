@@ -42,15 +42,70 @@ Since this problem is pretty straight forward, I didn't need any auxilary code t
 There are two test cases that stick out in my mind immediately. First, an empty string. This would and should return the value 0, because there is no substring at all.
 Next, is when every character in the string is unique so the output is just the length of the string itself.
 
-<script src="https://gist.github.com/jbasinger/ddd08a4c0f3b550e5e199326e51ca4fd.js?file=tests1.cs"></script>
+```csharp
+[Test]
+public void ShouldReturnTheWholeThing()
+{
+    var str = "qwertyuiop";
+    var res = _sut.LengthOfLongestSubstring(str);
+    res.ShouldBe(str.Length);
+}
+
+[Test]
+public void ShouldReturnZeroIfEmpty()
+{
+    var res = _sut.LengthOfLongestSubstring("");
+    res.ShouldBe(0);
+}
+```
 
 Another that jumps out after thinking of all the characters being unique is, what if they are all the same character. What if there is only one character total?
 
-<script src="https://gist.github.com/jbasinger/ddd08a4c0f3b550e5e199326e51ca4fd.js?file=tests2.cs"></script>
+```csharp
+[Test]
+public void ShouldReturnOneIfOneCharacter()
+{
+    var str = "o";
+    var res = _sut.LengthOfLongestSubstring(str);
+    res.ShouldBe(str.Length);
+}
+
+[Test]
+public void ShouldReturnOneIfAllTheSame()
+{
+    var str = "bbbbb";
+    var res = _sut.LengthOfLongestSubstring(str);
+    res.ShouldBe(1);
+}
+```
 
 The last three significant tests I can think of are, what if the longest string is in the beginning of the string, the end of the string or smack dab in the middle?
 
-<script src="https://gist.github.com/jbasinger/ddd08a4c0f3b550e5e199326e51ca4fd.js?file=tests3.cs"></script>
+```csharp
+[Test]
+public void ShouldReturnLongStringAtBeginning()
+{
+    var str = "poiuytytweqwrtwyr";
+    var res = _sut.LengthOfLongestSubstring(str);
+    res.ShouldBe(6);
+}
+
+[Test]
+public void ShouldReturnLongStringAtTheEnd()
+{
+    var str = "rywtrwqewtytyuiop";
+    var res = _sut.LengthOfLongestSubstring(str);
+    res.ShouldBe(6);
+}
+
+[Test]
+public void ShouldReturnLongStringInTheMiddle()
+{
+    var str = "qweqrrplikfudjggtyr";
+    var res = _sut.LengthOfLongestSubstring(str);
+    res.ShouldBe(10);
+}
+```
 
 The most frustrating part of making these tests were trying to come up with strings that actually fit the test case I was trying to find. I kept accidentally making them
 shorter or longer than they had to be and felt like I spent more time debugging the actual tests than the solution itself! But we got through it and thought of quite a 
@@ -66,7 +121,54 @@ If the length of the substring we just found was the longest so far, we'll updat
 
 We take a couple shortcuts in the beginning of the code to cover our edge cases of string lengths 0 and 1. Here is my solution function.
 
-<script src="https://gist.github.com/jbasinger/ddd08a4c0f3b550e5e199326e51ca4fd.js?file=solution.cs"></script>
+```csharp
+public int LengthOfLongestSubstring(string s)
+{
+    if(s.Length == 0)
+        return 0;
+
+    if (s.Length == 1)
+        return 1;
+
+    var maxLength = 1;
+    var curLength = 0;
+    var chars= new Dictionary<char, bool>(); 
+
+    for (var i = 0; i < s.Length; i++)
+    {
+        chars.Clear();
+        var firstChar = s[i];
+        chars[firstChar] = true;
+        curLength = 1;
+
+        for (var j = i+1; j < s.Length; j++)
+        {
+            var currentChar = s[j];
+            if (chars.ContainsKey(currentChar))
+            {
+                if (j == s.Length - 1)
+                {
+                    return maxLength;
+                }
+                break;
+            }
+
+            chars[currentChar] = true;
+            curLength++;
+            if (maxLength <= curLength)
+                maxLength = curLength;
+
+            if (j == s.Length - 1)
+            {
+                return maxLength;
+            }
+
+        }
+    }
+
+    return maxLength;
+}
+```
 
 ### Conclusion
 

@@ -59,7 +59,29 @@ That means, we'll be looping through the list while we're looping through the li
 
 Here is my take on the brute force method:
 
-<script src="https://gist.github.com/jbasinger/e67b70cb504773c5cda387e41bee3f9f.js?file=twosum.cs"></script>
+```csharp
+namespace LeetCode
+{
+    public class TwoSum_Problem
+    {
+        public static int[] TwoSum(int[] nums, int target)
+        {
+            for (int i = 0; i < nums.Length; i++)
+            {
+                for (int j = i+1; j < nums.Length; j++)
+                {
+                    if ((nums[i] + nums[j]) == target)
+                    {
+                        return new int[] {i, j};
+                    }
+                }
+            }
+
+            return new int[] { };
+        }
+    }
+}
+```
 
 As you can see, first I loop through the list of numbers passed. Then, I start a second loop on the list, but one index ahead, so we don't add a number to itself.
 That would be against the rules! 
@@ -80,7 +102,38 @@ Lets think about some edge cases.
 
 Here are my test cases:
 
-<script src="https://gist.github.com/jbasinger/e67b70cb504773c5cda387e41bee3f9f.js?file=twosum_tests.cs"></script>
+```csharp
+namespace LeetCode.Tests
+{
+    public class Tests
+    {
+        [Test]
+        public void ShouldReturnSumOfTarget()
+        {
+            var res = TwoSum_Problem.TwoSum(new int[] {2, 7, 11, 15}, 9);
+            res[0].ShouldBe(0);
+            res[1].ShouldBe(1);
+            
+            res = TwoSum_Problem.TwoSum(new int[] {3,2,4}, 6);
+            res[0].ShouldBe(1);
+            res[1].ShouldBe(2);
+            
+            res = TwoSum_Problem.TwoSum(new int[] {3,3}, 6);
+            res[0].ShouldBe(0);
+            res[1].ShouldBe(1);
+            
+            res = TwoSum_Problem.TwoSum(new int[] {3,2,3}, 6);
+            res[0].ShouldBe(0);
+            res[1].ShouldBe(2);
+            
+            res = TwoSum_Problem.TwoSum(new int[] {0,2,3,8,5,22,11,6}, 9);
+            res[0].ShouldBe(2);
+            res[1].ShouldBe(7);
+            
+        }
+    }
+}
+```
 
 I'm using the package [Shouldly](https://www.nuget.org/packages/Shouldly/) to assert my results. The rest is just standard [xUnit](https://xunit.net/).
 
