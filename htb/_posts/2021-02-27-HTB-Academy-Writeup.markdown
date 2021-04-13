@@ -17,7 +17,7 @@ Academy is an Easy level linux machine. Based on the creator and community stati
 
 ## Information Gathering
 
-### Nmap:
+### Nmap
 By scanning the target IP with Nmap, we're able to find what ports are open (`-p`), while fingerprinting the services running and their versions (`-sV`). We're also running the default set of scripts (`-sC`), which can help find additional information and automate some of our initial steps. Once the scan is completed, nmap will write the results to our Extracts folder (`-oA`)  
 `>> nmap -p22,80,33060 -sC -sV -oA Extracts/Academy 10.10.10.215`  
 ![Nmap](/assets/img/htb/HTB-Academy/nmap.png)

@@ -11,14 +11,13 @@ author: Ryan
 {:toc .large-only}
 
 *[Hack The Box](https://hackthebox.eu) is an online platform allowing you to test your penetration testing skills and exchange ideas and methodologies with thousands of people in the security field.*  
-![Header](/assets/img/htb/HTB-Omni/Header.png)
 
 Omni is an Easy level "Other" machine. Boxes typically fall under the "Linux" or "Windows" category, so this deviation from the norm should lead to a fun and interesting challenge. Based on the creator and community statistics, this box has a decent balance across all areas, but leaning slightly more towards realistic configurations exploited with existing CVEs.  
 ![Statistics](/assets/img/htb/HTB-Omni/Statistics.png)
 
 ## Information Gathering
 
-#### Nmap:
+#### Nmap
 By scanning the target IP with Nmap, we're able to find what ports are open (`-p`), while fingerprinting the services running and their versions (`-sV`). We're also running the default set of scripts (`-sC`), which can help find additional information and automate some of our initial steps. Once the scan is completed, nmap will write the results to our Extracts folder (`-oA`)  
 `>> nmap -p135,5985,8080,29817,29819,29820 -sV -sC -Pn -oA Extracts/Omni 10.10.10.204`  
 ![Nmap](/assets/img/htb/HTB-Omni/nmap.png)

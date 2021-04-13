@@ -11,14 +11,13 @@ author: Ryan
 {:toc .large-only}
 
 *[Hack The Box](https://hackthebox.eu) is an online platform allowing you to test your penetration testing skills and exchange ideas and methodologies with thousands of people in the security field.*  
-![HTB - Buff](/assets/img/htb/HTB-Buff/Header.png)
 
 Buff is an Easy level Windows machine. The box statistics show us that we will be focusing heavily on existing CVEs, while working on enumeration skills in a somewhat realistic setup.  
 ![Buff Statistics](/assets/img/htb/HTB-Buff/Statistics.png)
 
 ## Information Gathering
 
-#### Nmap:
+#### Nmap
 By scanning the tartget IP with Nmap, we're able to find what ports are open, while fingerprinting the services running and their versions.  
 `>> nmap -p7680,8080 -sC -sV -Pn  -oA Extracts/Buff 10.10.10.198`
 ![Nmap](/assets/img/htb/HTB-Buff/nmap.png)

@@ -11,14 +11,13 @@ author: Ryan
 {:toc .large-only}
 
 *[Hack The Box](https://hackthebox.eu) is an online platform allowing you to test your penetration testing skills and exchange ideas and methodologies with thousands of people in the security field.*  
-![Header](/assets/img/htb/HTB-SneakyMailer/Header.png)
 
 SneakyMailer is a Medium level Linux machine. The box creator graded the machine pretty heavily in the "Real" and "CVE" categories, but community statistics show a good mix across all areas. It should be an interesting box.  
 ![Statistics](/assets/img/htb/HTB-SneakyMailer/Statistics.png)
 
 ## Information Gathering
 
-#### Nmap:
+#### Nmap
 By scanning the target IP with Nmap, we're able to find what ports are open (`-p`), while fingerprinting the services running and their versions (`-sV`). We're also running the default set of scripts (`-sC`), which can help find additional information and automate some of our initial steps. Once the scan is completed, nmap will write the results to our Extracts folder (`-oA`)  
 `>> nmap -p21,22,25,80,143,993,8080 -sC -sV -oA Extracts/SneakyMailer 10.10.10.197 `
 ![Nmap](/assets/img/htb/HTB-SneakyMailer/nmap.png)
