@@ -1,0 +1,18 @@
+# If you have a `resume.json` file, copy it into `_data` and delete this file.
+# If you don't have a JSON Resume you can just edit this YAML file instead.
+# See also: <https://jsonresume.org/>.
+basics:
+  name: "Justin Basinger"
+  label: "Co-Founder of Science Viking Labs"
+  picture: "/assets/img/authors/justin.jpeg"
+  email: "justin@sciencevikinglabs.com"
+  website: "https://piedpiper.com"
+  summary: >
+    Justin was born and raised in central Maine. Nothing else is known about him.
+  profiles:
+    - network: "Twitter"
+      username: "basingiorno"
+      url: "https://twitter.com/basingiorno"
+    - network: "LinkedIn"
+      username: "Justin Basinger"
+      url: "www.linkedin.com/in/justin-basinger"

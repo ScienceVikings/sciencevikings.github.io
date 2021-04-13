@@ -21,3 +21,12 @@ services:
     stdin_open: true
     tty: true
     entrypoint: "/bin/bash"
+
+  image: #docker-compose run image
+    container_name: svl-blog-images
+    build: utils/
+    volumes:
+      - "./utils/images:/images"
+    stdin_open: true
+    tty: true
+    entrypoint: "/bin/sh"

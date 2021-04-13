@@ -1,3 +1,12 @@
 _site
 .sass-cache
+.jekyll-cache
+.jekyll-metadata
+vendor
+utils/images/output/**
+utils/images/*.png
+utils/images/*.jpg
+utils/images/*.jpeg
 node_modules
+leetcode_problems
+leetcode_*_header.png
