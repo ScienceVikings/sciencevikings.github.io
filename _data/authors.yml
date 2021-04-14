@@ -78,7 +78,7 @@ Justin:
     Full Stack Software Engineer, DevOps Engineer, Beard Enthusiast
 
   picture:
-    path:            /assets/img/authors/justin.jpeg
+    path:            /assets/img/authors/justin.jpg
     # srcset is optional, but can be used to provide higher res versions for retina displays
     # srcset:
     #   1x:            https://placehold.it/128x128
