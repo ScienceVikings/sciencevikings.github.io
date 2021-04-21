@@ -10,7 +10,7 @@ image:
 
 ## LeetCode Problem 5 - Longest Palindromic Substring
 
-In this post we'll be talking about solving the fifth [LeetCode](https://leetcode.com/problems/median-of-two-sorted-arrays/) problem. You can find my code for all my LeetCode submissions at [GitHub](https://github.com/jbasinger/LeetCode).
+In this post we'll be talking about solving the fifth [LeetCode](https://leetcode.com/problems/longest-palindromic-substring/) problem. You can find my code for all my LeetCode submissions at [GitHub](https://github.com/jbasinger/LeetCode).
 
 [LeetCode](https://leetcode.com/) is a site that provides programming problems for practice. A lot of developers use it to hone their skills or to practice for upcoming interviews.
 The questions available are used by large tech companies as interview questions, so it's a good place to start and the difficulty of the questions being Easy, Medium or Hard.
