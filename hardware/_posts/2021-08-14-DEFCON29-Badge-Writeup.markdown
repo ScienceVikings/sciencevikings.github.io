@@ -11,12 +11,12 @@ author: Ryan
 {:toc .large-only}
 
 
-DEFCON is one of the world's largest hacker conferences, taking place in Las Vegas for the past 29 years. Attendees are identified by badges, varying in types like Human, Goon, Creator, Speaker, Artist, Vendor, and Press. These badges allow a wearer adminssion to the con and, in recent years, can eclipse talks and villages with unique and challenging puzzles.
+DEFCON is one of the world's largest hacker conferences, taking place in Las Vegas for the past 29 years. Attendees are identified by badges, varying in types like Human, Goon, Creator, Speaker, Artist, Vendor, and Press. These badges allow a wearer admission to the con and, in recent years, can eclipse talks and villages with unique and challenging puzzles.
 
 ## Badge Walk-through
 This year's badge was the first from creators MK Factor, who did an amazing job of bridging the gap between the in-person and virtual attendees. With multiple ways to connect and sync with other badges, everyone was able to play along and get the most from their DEFCON Badge experience.
 
-The badge consisted of stacked boards hosting four RGB keys, three touch sensors, male/female connectors on the sides, USB-A and USB-C ports on the bottom, and a special lanyard cable with USB-A and USB-C plugs on the ends. The badge could be powered by battery, or either of the USB ports. Powering on the badge while holding down the top-left key would start a Simon Says game, with multiplayer scaled to any other badges connected. Connecting the badge to a phone or laptop resulted in a console with a player's Simon Says stats and badge challenge progression.
+The badge consisted of stacked boards hosting four RGB keys, three touch sensors, male/female connectors on the sides, USB-A and USB-C ports on the bottom, and a special lanyard cable with USB-A and USB-C plugs on the ends. The badge could be powered by battery, or either of the USB ports. Powering on the badge while holding down the top-left key would start a game of Simon Says, with multiplayer scaled to any other badges connected. Connecting the badge to a phone or laptop resulted in a console with a player's Simon Says stats and badge challenge progression.
 
 ![Badge Front](/assets/img/hardware/defcon29-badge-writeup/Badge_Front.jpg)
 
