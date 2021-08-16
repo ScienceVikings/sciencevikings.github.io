@@ -214,7 +214,7 @@ The resulting message is a poem about places we've been without any slots. If we
 
 ![Alexis Park](/assets/img/hardware/defcon29-badge-writeup/AlexisPark.png) 
 
-Alexis park hosted DEFCON for a number of years and is listed as being a non-gaming alternative to the rest of Vegas. It seems to fit what we're looking for, having "shared the signal", doesn't have any gambing, and after hosting DEFCON for 7 years, I'm sure some people do think it was the best.
+Alexis park hosted DEFCON for a number of years and is listed as being a non-gaming alternative to the rest of Vegas. It seems to fit what we're looking for.
 
 `AlexisPark` leads us to the next challenge.
 
